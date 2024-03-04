@@ -63,11 +63,11 @@ SETUP:
 
 	SEI //habilitamos interrupcoines
 
-	CLR count_mode
+	CLR count_state
 	CLR count_al_mode
 
 LOOP:
-	OUT PORTB, count_mode
+	OUT PORTB, PB5
 
 //*******************************************************************
 //SUBRUTINAS DE INTERRUPCIÓN
@@ -78,9 +78,22 @@ ISR_PCINT1:
 	IN R16,SREG
 	PUSH R16
 
-	INC count_mode
-	//interrupción de modos
+	IN R16, PINC
+	SBRS r16, 0 //PC0 igual a 1?
+	RJMP ISR_POP
+	RJMP CAMBIO_MODO
 
+CAMBIO_MODO:
+	INC count_state
+	CPI count_state,3
+	BREQ OVERFLOW
+	CPI count_state,0
+	BREQ ISR_POP
+
+OVERFLOW:
+	CLR count_state
+	RJMP ISR_POP
+ISR_POP:
 	POP R16
 	OUT SREG,R16
 	POP R16

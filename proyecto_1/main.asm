@@ -163,7 +163,7 @@ delayT0:
 	LDI R16, (1 << CS02) | (1 << CS00)
 	OUT TCCR0B, R16
 
-	LDI R16,178
+	LDI R16,1
 	OUT TCNT0, R16
 
 	RET
@@ -182,6 +182,12 @@ ISR_TIMER:
 	BRNE SALTO
 	CLR counter
 
+	INC segundos
+	CPI segundos,60
+	BREQ empieza
+	RJMP SALTO
+
+empieza:
 	INC count_unidades
 	CPI count_unidades, 0b0000_1010
 	BREQ overflow

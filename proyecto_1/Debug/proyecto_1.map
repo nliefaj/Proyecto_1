@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Wed Mar 06 16:43:24 2024
+AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Wed Mar 06 16:54:50 2024
 
 
 EQU  SIGNATURE_000 0000001e
@@ -696,23 +696,23 @@ EQU  TWIaddr      00000030
 EQU  SPMRaddr     00000032
 EQU  INT_VECTORS_SIZE 00000034
 CSEG MAIN         00000026
-CSEG ISR_TIMER    0000008e
+CSEG ISR_TIMER    0000008c
 DEF  count_unidades r21
 DEF  count_decenas r22
 DEF  count_umin   r23
 DEF  count_dmin   r25
 DEF  counter      r18
 DEF  segundos     r19
-CSEG TABLA7SEG    000000bd
+CSEG TABLA7SEG    000000bb
 CSEG SETUP        0000002d
-CSEG delayT0      00000089
-CSEG LOOP         00000050
-CSEG delaybounce  000000b9
-CSEG SALTO        000000a0
-CSEG empieza      0000009b
-CSEG overflow     000000a4
-CSEG overflow_decenas 000000a9
-CSEG verificar_hora 000000b3
-CSEG overflow_umin 000000b0
-CSEG ultima_hora  000000b6
-CSEG delay        000000ba
+CSEG delayT0      00000087
+CSEG LOOP         0000004e
+CSEG delaybounce  000000b7
+CSEG SALTO        0000009e
+CSEG empieza      00000099
+CSEG overflow     000000a2
+CSEG overflow_decenas 000000a7
+CSEG verificar_hora 000000b1
+CSEG overflow_umin 000000ae
+CSEG ultima_hora  000000b4
+CSEG delay        000000b8

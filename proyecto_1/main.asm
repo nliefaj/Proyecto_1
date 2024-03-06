@@ -163,7 +163,7 @@ delayT0:
 	LDI R16, (1 << CS02) | (1 << CS00)
 	OUT TCCR0B, R16
 
-	LDI R16,1
+	LDI R16,178
 	OUT TCNT0, R16
 
 	RET
@@ -188,6 +188,7 @@ ISR_TIMER:
 	RJMP SALTO
 
 empieza:
+	CLR segundos
 	INC count_unidades
 	CPI count_unidades, 0b0000_1010
 	BREQ overflow
@@ -236,20 +237,28 @@ delaybounce:
 		DEC r16
 		BRNE delay
 	RET
+
+//*******************************************************************
+//INTERRUPCIÓN DE BOTONES
+//*******************************************************************
 /*ISR_PCINT1:
 	PUSH R16
 	IN R16,SREG
 	PUSH R16
 
-	IN R16, PINC
-	SBRS r16, 0 //PC0 igual a 1?
-	RJMP ISR_POP
-	RJMP CAMBIO_MODO
+	SBRS count_state, 0 //PC0 igual a 1?
+	RJMP ESTADO0
+	RJMP ESTADO1
 
-CAMBIO_MODO:
+ESTADO0:
+	NOP
+ESTADO1:
+	IN R16,PINC
+	SBRS R16,0 ;PC0=1
 	INC count_state
 	CPI count_state,3
 	BREQ OVERFLOW
+	SBRS count_state,0//estado=0001?
 	CPI count_state,0
 	BREQ ISR_POP
 

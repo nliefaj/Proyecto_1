@@ -23,20 +23,23 @@
   <FILE>proyecto_1.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <MAIN><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>43</LINE></MAIN>
-  <ISR_TIMER><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>170</LINE></ISR_TIMER>
-  <TABLA7SEG><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>277</LINE></TABLA7SEG>
-  <SETUP><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>53</LINE></SETUP>
-  <delayT0><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>162</LINE></delayT0>
-  <LOOP><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>102</LINE></LOOP>
-  <delaybounce><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>234</LINE></delaybounce>
-  <SALTO><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>197</LINE></SALTO>
-  <empieza><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>190</LINE></empieza>
-  <overflow><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>203</LINE></overflow>
-  <overflow_decenas><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>210</LINE></overflow_decenas>
-  <verificar_hora><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>224</LINE></verificar_hora>
-  <overflow_umin><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>219</LINE></overflow_umin>
-  <ultima_hora><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>229</LINE></ultima_hora>
-  <delay><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>236</LINE></delay>
+  <MAIN><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>47</LINE></MAIN>
+  <ISR_PCINT1><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>275</LINE></ISR_PCINT1>
+  <ISR_TIMER><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>182</LINE></ISR_TIMER>
+  <TABLA7SEG><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>317</LINE></TABLA7SEG>
+  <SETUP><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>57</LINE></SETUP>
+  <delayT0><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>174</LINE></delayT0>
+  <LOOP><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>104</LINE></LOOP>
+  <delaybounce><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>265</LINE></delaybounce>
+  <SALTO><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>211</LINE></SALTO>
+  <empieza><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>202</LINE></empieza>
+  <overflow><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>217</LINE></overflow>
+  <overflow_decenas><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>227</LINE></overflow_decenas>
+  <verificar_hora><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>252</LINE></verificar_hora>
+  <overflow_uhora><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>242</LINE></overflow_uhora>
+  <ultima_hora><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>260</LINE></ultima_hora>
+  <delay><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>267</LINE></delay>
+  <ISR_POP><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>308</LINE></ISR_POP>
+  <overflow_mode><FILE>C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm</FILE><LINE>303</LINE></overflow_mode>
  </LABELS>
 </ASSEMBLER_INFO>

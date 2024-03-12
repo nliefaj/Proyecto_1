@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Sat Mar 09 21:28:23 2024
+AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Tue Mar 12 14:36:34 2024
 
 
 EQU  SIGNATURE_000 0000001e
@@ -696,25 +696,46 @@ EQU  TWIaddr      00000030
 EQU  SPMRaddr     00000032
 EQU  INT_VECTORS_SIZE 00000034
 CSEG MAIN         00000026
-CSEG ISR_PCINT1   000000d2
-CSEG ISR_TIMER    00000094
-DEF  mode         r18
+CSEG ISR_PCINT1   0000011b
+CSEG ISR_TIMER    000000dd
+DEF  flags        r13
+DEF  min_conf     r14
+DEF  hora_conf    r15
+DEF  modo_btn     r18
 DEF  counter      r19
 DEF  segundos     r20
 DEF  count_unidades r21
 DEF  count_decenas r22
-CSEG TABLA7SEG    000000e0
+CSEG TABLA7SEG    00000198
 CSEG SETUP        0000002d
-CSEG delayT0      0000008f
+CSEG delayT0      000000d8
 CSEG LOOP         0000004c
-CSEG delaybounce  000000ce
-CSEG SALTO        000000a6
-CSEG empieza      0000009f
-CSEG overflow     000000aa
-CSEG overflow_decenas 000000b2
-CSEG verificar_hora 000000c5
-CSEG overflow_uhora 000000be
-CSEG ultima_hora  000000cb
-CSEG delay        000000cf
-CSEG ISR_POP      000000dc
-CSEG overflow_mode 000000da
+CSEG CONFIG_R     00000095
+CSEG delaybounce  00000117
+CSEG SALTO        000000ef
+CSEG empieza      000000e8
+CSEG overflow     000000f3
+CSEG overflow_decenas 000000fb
+CSEG verificar_hora 0000010e
+CSEG overflow_uhora 00000107
+CSEG ultima_hora  00000114
+CSEG delay        00000118
+CSEG INT_1        00000122
+CSEG INT_2        00000126
+CSEG ISR_POP      00000194
+CSEG btn1         0000012f
+CSEG btn2         0000013a
+CSEG btn3         0000014d
+CSEG overflow_modo 00000137
+CSEG cambiar_display 00000144
+CSEG overflow_displays 0000014a
+CSEG configurar_hora 00000153
+CSEG cambiar_disp1 00000160
+CSEG cambiar_disp2 0000016c
+CSEG cambiar_disp3 00000178
+CSEG cambiar_disp4 0000018a
+CSEG overflow_disp1 00000168
+CSEG overflow_disp2 00000174
+CSEG ver_horaconf 00000180
+CSEG overflow_disp3 00000186
+CSEG overflow_disp4 00000192

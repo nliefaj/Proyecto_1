@@ -25,7 +25,10 @@
 ;.DEF al_flag=R14; no se puede utilizar
 ;fecha evaluarla en el registro 15
 ;registro 16 y 17 para usarlos como variables fáciles
-.DEF mode=R18
+.DEF flags=R13
+.DEF min_conf=R14
+.DEF hora_conf=R15
+.DEF modo_btn=R18
 .DEF counter=R19
 .DEF segundos=R20
 .DEF count_unidades=R21
@@ -56,11 +59,8 @@ MAIN:
 
 SETUP:
 	
-	LDI R16, 0b0001_1111//cambiar esto después de la prueba
+	LDI R16, 0b0010_0000//cambiar esto después de la prueba
 	OUT DDRC, R16 //Set PINES C segpun esquema de entradas y salidas
-
-	LDI r16,0b0001_1111 //habilitamos pullup para todos los botones del puerto C
-	OUT PORTC,r16
 
 	LDI R16, 0b0111_1111//Configura el puerto D (7seg) como salida
 	OUT DDRD,R16
@@ -99,12 +99,19 @@ SETUP:
 	CLR count_decenas
 	CLR counter
 	CLR segundos
+	CLR min_conf ;contador para cambiar displays
+	CLR hora_conf
 
 
 LOOP:
 	//enciende el display que tiene que mostrar y deja que los valores se muestren a tiempo completo
-	//bloque unidades de minuto
-	SBI PORTB,PB0
+	LDI R16,0b0111_0000
+	AND R16,modo_btn
+	SWAP R16
+	SBRC R16,0
+	CALL CONFIG_R	
+	//MUESTRA EL RELOJ NORMAL
+	SBI PORTB,PB0 
 	LDI R16,0b0000_1111
 	AND R16,count_unidades
 	LDI ZH, HIGH(TABLA7SEG<<1)
@@ -166,6 +173,73 @@ LOOP:
 	CALL delaybounce
 
 	RJMP LOOP
+	
+CONFIG_R:
+	SBI PORTB,PB0
+	LDI R16,0b0000_1111
+	AND R16,min_conf
+	LDI ZH, HIGH(TABLA7SEG<<1)
+	LDI ZL, LOW(TABLA7SEG<<1)
+	ADD ZL,R16
+	CLR R24
+	LPM R24,Z //Load from program memory R16
+	OUT PORTD,R24
+	CALL delaybounce
+	CBI PORTB,PB0
+	CALL delaybounce
+	CALL delaybounce
+
+	//bloque para decenas de minuto
+	SBI PORTB,PB1
+	LDI R16,0b1111_0000
+	AND R16,min_conf
+	LDI ZH, HIGH(TABLA7SEG<<1)
+	LDI ZL, LOW(TABLA7SEG<<1)
+	SWAP R16
+	ADD ZL,R16
+	CLR R24
+	LPM R24,Z //Load from program memory R16
+	OUT PORTD,R24
+	CALL delaybounce
+	CBI PORTB,PB1
+	CALL delaybounce
+	CALL delaybounce
+
+	//bloque para unidades de hora
+	SBI PORTB,PB2
+	LDI R16,0b0000_1111
+	AND R16,hora_conf
+	LDI ZH, HIGH(TABLA7SEG<<1)
+	LDI ZL, LOW(TABLA7SEG<<1)
+	ADD ZL,R16
+	CLR R24
+	LPM R24,Z //Load from program memory R16
+	OUT PORTD,R24
+	CALL delaybounce
+	CBI PORTB,PB2
+	CALL delaybounce
+	CALL delaybounce
+
+	//bloque para decenas de hora
+	SBI PORTB,PB3
+	LDI R16,0b1111_0000
+	AND R16,hora_conf
+	SWAP R16
+	LDI ZH, HIGH(TABLA7SEG<<1)
+	LDI ZL, LOW(TABLA7SEG<<1)
+	ADD ZL,R16
+	CLR R24
+	LPM R24,Z //Load from program memory R16
+	OUT PORTD,R24
+	CALL delaybounce
+	CBI PORTB,PB3
+	CALL delaybounce
+	CALL delaybounce
+
+	RETI
+	
+	//bloque unidades de minuto
+
 
 //*******************************************************************
 //SUBRUTINAS DE INTERRUPCIÓN
@@ -186,18 +260,27 @@ ISR_TIMER:
 
 	//SBI PORTB,PB5
 
-	LDI R16,178
+	LDI R16,1
 	OUT TCNT0,R16
 
 	INC counter
-	CPI counter, 178
+	CPI counter, 1
 	BRNE SALTO
 	CLR counter
 
-	INC segundos
-	CPI segundos,60
+	;INC segundos
+	;CPI segundos,60
+	/*SBRC flags,0
+	CALL set_hora*/
 	RJMP empieza
 	RJMP SALTO
+
+/*set_hora:
+	CLR count_unidades
+	CLR count_decenas
+	LDI R17,0b0000_1111
+	AND R17,min_conf*/
+
 
 empieza:
 	CLR segundos
@@ -276,35 +359,162 @@ ISR_PCINT1:
 	PUSH R16
 	IN R16,SREG
 	PUSH R16
-
-
-
-	LDI R16,0b0001_1111 
-	IN R17,PORTC
-	COM R17
-	AND R17,R16
-
-	RJMP ISR_POP
-
-/*INC_MODE:
-	INC mode
-	CPI mode,0b0100
-	BREQ overflow_mode
-	RJMP ISR_POP
-
-ESTADOx1:
-	SBRS mode,1
-	RJMP ESTADO_01 ;configurar hora
-	;RJMP ESTADO 11 ;configurar fecha
-	RJMP ISR_POP
-
-ESTADO_01:*/
 	
-overflow_mode:
-	CLR mode
+	SBRS modo_btn,7
+	RJMP INT_1
+	RJMP INT_2
+	RJMP ISR_POP
+	
+INT_1:
+	LDI R16, 0b1000_0000
+	OR modo_btn,R16
+	IN R17,PINC
 	RJMP ISR_POP
 
-	
+INT_2:
+	LDI R16,0b0111_1111
+	AND modo_btn,R16
+	CPI R17,0b0001
+	BREQ btn1
+	CPI R17,0b0010
+	BREQ btn2
+	CPI R17,0b0100
+	BREQ btn3
+	;CPI R17,0b0111
+	;BREQ btn4
+	RJMP ISR_POP
+
+btn1:
+	SWAP modo_btn
+	INC modo_btn
+	LDI R16, 0b0000_1111
+	AND R16,modo_btn
+	SWAP modo_btn
+	CPI R16,0b0101
+	BREQ overflow_modo
+	RJMP ISR_POP
+
+overflow_modo:
+	LDI R16,0b0000_1111
+	AND modo_btn,R16
+	RJMP ISR_POP
+
+btn2:
+	MOV R16,modo_btn
+	SWAP R16
+	ANDI R16,0b0000_1111
+	CPI R16, 0b0001
+	BREQ cambiar_display
+	CPI r16,0b0011
+	BREQ cambiar_display
+	CPI R16,0b0100
+	BREQ cambiar_display
+	RJMP ISR_POP
+cambiar_display:
+	INC modo_btn
+	MOV R16,modo_btn
+	ANDI R16,0b0000_1111
+	CPI R16,0b0101
+	BREQ overflow_displays
+	RJMP ISR_POP
+overflow_displays:
+	LDI R16,0b1111_0000
+	AND modo_btn,R16
+	RJMP ISR_POP
+
+btn3:
+	MOV R16, modo_btn
+	SWAP R16
+	ANDI R16,0b0000_1111
+	CPI R16,0b0000_001
+	BREQ configurar_hora
+	RJMP ISR_POP
+
+configurar_hora:
+	CLR hora_conf
+	CLR min_conf
+	LDI R17, 0b0000_1111
+	AND R17,modo_btn
+	CPI R17,1
+	BREQ cambiar_disp1
+	CPI R17,2
+	BREQ cambiar_disp2
+	CPI R17,3
+	BREQ cambiar_disp3
+	CPI R17,4
+	BREQ cambiar_disp4
+	RJMP LOOP
+
+cambiar_disp1:
+	LDI R16,0b0000_0001
+	OR flags,R16
+	INC min_conf
+	MOV R17,min_conf
+	ANDI R17,0b0000_1111
+	CPI R17,0b0000_1010
+	BREQ overflow_disp1
+	RJMP ISR_POP
+
+overflow_disp1:
+	LDI R16,0b1111_0000
+	AND R16,min_conf
+	MOV min_conf, R16
+	RJMP ISR_POP
+
+cambiar_disp2:
+	SWAP min_conf
+	INC min_conf
+	MOV R17,min_conf
+	SWAP min_conf
+	ANDI R17,0b0000_1111
+	CPI R17,0b0000_0110
+	BREQ overflow_disp2
+	RJMP ISR_POP
+
+overflow_disp2:
+	LDI R16,0b0000_1111
+	AND R16,min_conf
+	MOV min_conf,R16
+	RJMP ISR_POP
+
+cambiar_disp3:
+	INC hora_conf
+	MOV R17,hora_conf
+	ANDI R17,0b0000_1111
+	CPI R17,0b0000_0100
+	BREQ ver_horaconf
+	CPI R17,0b0000_1010
+	BREQ overflow_disp3
+	RJMP ISR_POP
+
+ver_horaconf:
+	LDI R17,0b1111_0000
+	AND R17,hora_conf
+	SWAP R17
+	CPI R17,0b0000_0010
+	RJMP overflow_disp4
+	RJMP ISR_POP
+
+overflow_disp3:
+	LDI R16,0b1111_0000
+	AND R16,hora_conf
+	MOV hora_conf,R16
+	RJMP ISR_POP
+
+cambiar_disp4:
+	SWAP hora_conf
+	INC hora_conf
+	MOV R17,hora_conf
+	SWAP hora_conf
+	ANDI R17,0b0000_1111
+	CPI R17,0b0000_0011
+	BREQ overflow_disp2
+	RJMP ISR_POP
+
+overflow_disp4:
+	CLR hora_conf
+	RJMP ISR_POP
+
 ISR_POP:
 	POP R16
 	OUT SREG,R16

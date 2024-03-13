@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Tue Mar 12 19:42:27 2024
+AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Tue Mar 12 20:35:53 2024
 
 [builtin](2): Including file 'D:/microchip_studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm(11): Including file 'D:/microchip_studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1144,7 +1144,7 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  ESTADOx1:
 000051 fd25                      	SBRC modo_btn,5
 000052 c011                      	RJMP ESTADO11 //en este estado se congigura la fecha
-                                 	//realiza el estado 01-->configurar fecha
+                                 	//realiza el estado 01-->configurar hora
 000053 e00f                      	LDI R16,0b0000_1111
 000054 210e                      	AND R16,uni_conf
 000055 2e00                      	MOV R0,R16; primer display

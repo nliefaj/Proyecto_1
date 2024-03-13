@@ -113,7 +113,7 @@ LOOP:
 ESTADOx1:
 	SBRC modo_btn,5
 	RJMP ESTADO11 //en este estado se congigura la fecha
-	//realiza el estado 01-->configurar fecha
+	//realiza el estado 01-->configurar hora
 	LDI R16,0b0000_1111
 	AND R16,uni_conf
 	MOV R0,R16; primer display

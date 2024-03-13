@@ -35,7 +35,8 @@
 .DEF count_decenas=R22
 ;.DEF count_umin=R23
 ;registro 24 único para mostrar valores
-;.DEF count_dmin=R25
+.DEF dia=R25
+.DEF mes=R26
 
 //*******************************************************************
 //STACK
@@ -102,6 +103,8 @@ SETUP:
 	CLR uni_conf ;contador para cambiar displays
 	CLR dec_conf
 	CLR modo_btn
+	LDI dia,0b000_0001
+	LDI mes,0b001_0000
 
 
 LOOP:
@@ -325,7 +328,87 @@ verificar_hora:
 ultima_hora:
 	LDI count_unidades,0b0000_0000
 	LDI count_decenas,0b0000_0000
+	INC dia
+	MOV R16,dia
+	ANDI R16,0b0000_1111
+	CPI R16,0b0000_1001//verifica si dia es 
+	BREQ verificar_feb
+	CPI R16,0b0000_0001
+	BREQ verificar_mes30
+	CPI R16,0b0000_0010
+	BREQ verificar_mes31
 	RJMP SALTO
+
+verificar_feb:
+	MOV R16,mes 
+	CPI R16,0b0000_0010//verificar si mes =0/2
+	BREQ febrero
+	RJMP SALTO
+
+febrero:
+	INC mes
+	LDI dia,0b0000_0001
+	RJMP SALTO
+
+verificar_mes30
+	MOV R16,mes
+	CPI R16,0b0000_0100;verificar si mes es 0/4   
+	BREQ mes30
+	CPI R16,0b0000_0110;0/6   
+	BREQ mes30
+	CPI R16,0b0000_1001; 0/9  
+	BREQ septiembre
+	CPI R16, 0b0001_0001; 1/1
+	BREQ mes_30
+	RJMP SALTO
+
+septiembre:
+	MOV R16,mes
+	SWAP R16
+	INC R16
+	SWAP R16
+	MOV mes,R16
+	LDI dia,0b0000_0001
+	RJMP SALTO
+
+mes30:
+	INC mes
+	LDI dia,0b0000_0001
+	RJMP SALTO
+
+verificar_mes31:
+	MOV R16,mes
+	CPI R16,0b0000_0001;verificar si mes es 0/1  
+	BREQ mes31
+	CPI R16,0b0000_0101;0/3   
+	BREQ mes31
+	CPI R16,0b0000_0101; 0/5 
+	BREQ mes_31
+	CPI R16, 0b0000_1001; 07
+	BREQ mes_31
+	CPI R16, 0b0000_1000; 08
+	BREQ mes_31
+	CPI R16, 0b0001_0000; 10
+	BREQ mes_31
+	CPI R16, 0b0001_0010; 12
+	BREQ diciembre
+	RJMP SALTO
+
+mes_31:
+	INC mes
+	LDI dia,0b0000_0001
+	RJMP SALTO
+
+diciembre:
+	LDI mes,0b0000_0001
+	LDI dia,0b0000_0001
+	RJMP SALTO
+
+
+
+overflow_udia:
+	//trabajar con decenas de dias 0b1111_xxxx
+
 
 delaybounce:
 	LDI r16,250//250 para notar el valor de muestreo en los display

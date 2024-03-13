@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Tue Mar 12 23:27:36 2024
+AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Wed Mar 13 13:26:31 2024
 
 [builtin](2): Including file 'D:/microchip_studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm(11): Including file 'D:/microchip_studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1047,9 +1047,9 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  .org 0x00
 000000 940c 0026                 	JMP MAIN			//Vector reset
                                  .org 0x08				//Vector interrupçion puerto c (entrada de los botones)
-000008 940c 013e                 	JMP ISR_PCINT1
+000008 940c 014d                 	JMP ISR_PCINT1
                                  .org 0x0020 //interrupción timer0
-000020 940c 00bd                 	JMP ISR_TIMER
+000020 940c 00cc                 	JMP ISR_TIMER
                                  //*******************************************************************
                                  //CONTADORES
                                  //*******************************************************************
@@ -1085,7 +1085,7 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
 000029 bf1e                      	OUT SPH,R17
                                  
 00002a e0f3                      	LDI ZH, HIGH(TABLA7SEG<<1)
-00002b e7e2                      	LDI ZL, LOW(TABLA7SEG<<1)
+00002b e9ee                      	LDI ZL, LOW(TABLA7SEG<<1)
 00002c 9104                      	LPM R16,Z
                                  
                                  SETUP:
@@ -1120,7 +1120,7 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
 000040 e000                      	LDI R16,0
 000041 9300 00c1                 	STS UCSR0B,R16
                                  
-000043 940e 00b8                 	CALL delayT0
+000043 940e 00c7                 	CALL delayT0
                                  
 000045 9478                      	SEI //habilitamos interrupcoines
                                  
@@ -1141,7 +1141,7 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  	//enciende el display que tiene que mostrar y deja que los valores se muestren a tiempo completo
 00004f fd24                      	SBRC modo_btn,4
 000050 c002                      	RJMP ESTADOx1
-000051 c018                      	RJMP ESTADOx0
+000051 c027                      	RJMP ESTADOx0
 000052 cffc                      	RJMP LOOP
                                  ESTADOx1:
 000053 fd25                      	SBRC modo_btn,5
@@ -1164,94 +1164,111 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
 000060 210f                      	AND R16,dec_conf
 000061 9502                      	SWAP R16
 000062 2ec0                      	MOV R12,R16 ;cuarto display
-000063 940e 007d                 	CALL display
+000063 940e 008c                 	CALL display
 000065 cfe9                      	RJMP LOOP
                                  ESTADO11: 
 000066 0000                      	nop
 000067 cfe7                      	RJMP LOOP
-                                 ESTADO10:
-000068 0000                      	nop 
-000069 cfe5                      	RJMP LOOP
+                                 ESTADO10:;muestra fecha
+000068 e00f                      	LDI R16,0b0000_1111
+000069 2309                      	AND R16,dia
+00006a 2e00                      	MOV R0,R16; primer display
+                                 
+00006b ef00                      	LDI R16,0b1111_0000
+00006c 2309                      	AND R16,dia
+00006d 9502                      	SWAP R16
+00006e 2e10                      	MOV R1,R16;segundo display
+                                 
+00006f e00f                      	LDI R16,0b0000_1111
+000070 2307                      	AND R16,mes
+000071 2e20                      	MOV R2,R16;tercer diplay
+                                 
+000072 ef00                      	LDI R16,0b1111_0000
+000073 2307                      	AND R16,mes
+000074 9502                      	SWAP R16
+000075 2ec0                      	MOV R12,R16 ;cuarto display
+000076 940e 008c                 	CALL display
+000078 cfd6                      	RJMP LOOP
                                  ESTADOx0:
-00006a fd25                      	SBRC modo_btn,5
-00006b cffc                      	RJMP ESTADO10 ;muestra la fecha
-                                 	//aquí se ejecuta el estado 00_mostrar hora
-00006c e00f                      	LDI R16,0b0000_1111
-00006d 2309                      	AND R16,dia
-00006e 2e00                      	MOV R0,R16; primer display
+000079 fd25                      	SBRC modo_btn,5
+00007a cfed                      	RJMP ESTADO10 ;muestra la fecha
+                                 	//aqui se ejecuta el estado 00_mostrar hora
+00007b e00f                      	LDI R16,0b0000_1111
+00007c 2305                      	AND R16,count_unidades
+00007d 2e00                      	MOV R0,R16; primer display
                                  
-00006f ef00                      	LDI R16,0b1111_0000
-000070 2309                      	AND R16,dia
-000071 9502                      	SWAP R16
-000072 2e10                      	MOV R1,R16;segundo display
+00007e e00f                      	LDI R16,0b0000_1111
+00007f 2306                      	AND R16,count_decenas
+000080 2e10                      	MOV R1,R16;segundo display
                                  
-000073 e00f                      	LDI R16,0b0000_1111
-000074 2307                      	AND R16,mes
-000075 2e20                      	MOV R2,R16;tercer diplay
+000081 ef00                      	LDI R16,0b1111_0000
+000082 2305                      	AND R16,count_unidades
+000083 9502                      	SWAP R16
+000084 2e20                      	MOV R2,R16;tercer diplay
                                  
-000076 ef00                      	LDI R16,0b1111_0000
-000077 2307                      	AND R16,mes
-000078 9502                      	SWAP R16
-000079 2ec0                      	MOV R12,R16 ;cuarto display
-00007a 940e 007d                 	CALL display
-00007c cfd2                      	RJMP LOOP
+000085 ef00                      	LDI R16,0b1111_0000
+000086 2306                      	AND R16,count_decenas
+000087 9502                      	SWAP R16
+000088 2ec0                      	MOV R12,R16 ;cuarto display
+000089 940e 008c                 	CALL display
+00008b cfc3                      	RJMP LOOP
                                  
                                  display:
                                  	//MUESTRA EL RELOJ NORMAL
-00007d 9a28                      	SBI PORTB,PB0 
-00007e e0f3                      	LDI ZH, HIGH(TABLA7SEG<<1)
-00007f e7e2                      	LDI ZL, LOW(TABLA7SEG<<1)
-000080 0de0                      	ADD ZL,R0
-000081 2788                      	CLR R24
-000082 9184                      	LPM R24,Z //Load from program memory R16
-000083 b98b                      	OUT PORTD,R24
-000084 940e 013a                 	CALL delaybounce
-000086 9828                      	CBI PORTB,PB0
-000087 940e 013a                 	CALL delaybounce
-000089 940e 013a                 	CALL delaybounce
+00008c 9a28                      	SBI PORTB,PB0 
+00008d e0f3                      	LDI ZH, HIGH(TABLA7SEG<<1)
+00008e e9ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+00008f 0de0                      	ADD ZL,R0
+000090 2788                      	CLR R24
+000091 9184                      	LPM R24,Z //Load from program memory R16
+000092 b98b                      	OUT PORTD,R24
+000093 940e 0149                 	CALL delaybounce
+000095 9828                      	CBI PORTB,PB0
+000096 940e 0149                 	CALL delaybounce
+000098 940e 0149                 	CALL delaybounce
                                  
                                  	//bloque para decenas de minuto
-00008b 9a29                      	SBI PORTB,PB1
-00008c e0f3                      	LDI ZH, HIGH(TABLA7SEG<<1)
-00008d e7e2                      	LDI ZL, LOW(TABLA7SEG<<1)
-00008e 0de1                      	ADD ZL,R1
-00008f 2788                      	CLR R24
-000090 9184                      	LPM R24,Z //Load from program memory R16
-000091 b98b                      	OUT PORTD,R24
-000092 940e 013a                 	CALL delaybounce
-000094 9829                      	CBI PORTB,PB1
-000095 940e 013a                 	CALL delaybounce
-000097 940e 013a                 	CALL delaybounce
-                                 
-                                 	//bloque para unidades de hora
-000099 9a2a                      	SBI PORTB,PB2
-00009a 9502                      	SWAP R16
+00009a 9a29                      	SBI PORTB,PB1
 00009b e0f3                      	LDI ZH, HIGH(TABLA7SEG<<1)
-00009c e7e2                      	LDI ZL, LOW(TABLA7SEG<<1)
-00009d 0de2                      	ADD ZL,R2
+00009c e9ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+00009d 0de1                      	ADD ZL,R1
 00009e 2788                      	CLR R24
 00009f 9184                      	LPM R24,Z //Load from program memory R16
 0000a0 b98b                      	OUT PORTD,R24
-0000a1 940e 013a                 	CALL delaybounce
-0000a3 982a                      	CBI PORTB,PB2
-0000a4 940e 013a                 	CALL delaybounce
-0000a6 940e 013a                 	CALL delaybounce
+0000a1 940e 0149                 	CALL delaybounce
+0000a3 9829                      	CBI PORTB,PB1
+0000a4 940e 0149                 	CALL delaybounce
+0000a6 940e 0149                 	CALL delaybounce
                                  
-                                 	//bloque para decenas de hora
-0000a8 9a2b                      	SBI PORTB,PB3
+                                 	//bloque para unidades de hora
+0000a8 9a2a                      	SBI PORTB,PB2
 0000a9 9502                      	SWAP R16
 0000aa e0f3                      	LDI ZH, HIGH(TABLA7SEG<<1)
-0000ab e7e2                      	LDI ZL, LOW(TABLA7SEG<<1)
-0000ac 0dec                      	ADD ZL,R12
+0000ab e9ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+0000ac 0de2                      	ADD ZL,R2
 0000ad 2788                      	CLR R24
 0000ae 9184                      	LPM R24,Z //Load from program memory R16
 0000af b98b                      	OUT PORTD,R24
-0000b0 940e 013a                 	CALL delaybounce
-0000b2 982b                      	CBI PORTB,PB3
-0000b3 940e 013a                 	CALL delaybounce
-0000b5 940e 013a                 	CALL delaybounce
+0000b0 940e 0149                 	CALL delaybounce
+0000b2 982a                      	CBI PORTB,PB2
+0000b3 940e 0149                 	CALL delaybounce
+0000b5 940e 0149                 	CALL delaybounce
                                  
-0000b7 9508                      	RET
+                                 	//bloque para decenas de hora
+0000b7 9a2b                      	SBI PORTB,PB3
+0000b8 9502                      	SWAP R16
+0000b9 e0f3                      	LDI ZH, HIGH(TABLA7SEG<<1)
+0000ba e9ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+0000bb 0dec                      	ADD ZL,R12
+0000bc 2788                      	CLR R24
+0000bd 9184                      	LPM R24,Z //Load from program memory R16
+0000be b98b                      	OUT PORTD,R24
+0000bf 940e 0149                 	CALL delaybounce
+0000c1 982b                      	CBI PORTB,PB3
+0000c2 940e 0149                 	CALL delaybounce
+0000c4 940e 0149                 	CALL delaybounce
+                                 
+0000c6 9508                      	RET
                                  	
                                  	//bloque unidades de minuto
                                  
@@ -1261,34 +1278,34 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  //*******************************************************************
                                  
                                  delayT0:
-0000b8 e005                      	LDI R16, (1 << CS02) | (1 << CS00)
-0000b9 bd05                      	OUT TCCR0B, R16
+0000c7 e005                      	LDI R16, (1 << CS02) | (1 << CS00)
+0000c8 bd05                      	OUT TCCR0B, R16
                                  
-0000ba e001                      	LDI R16,1
-0000bb bd06                      	OUT TCNT0, R16
+0000c9 e001                      	LDI R16,1
+0000ca bd06                      	OUT TCNT0, R16
                                  
-0000bc 9508                      	RET
+0000cb 9508                      	RET
                                  ISR_TIMER:
-0000bd 930f                      	PUSH R16
-0000be b70f                      	IN R16,SREG
-0000bf 930f                      	PUSH R16
+0000cc 930f                      	PUSH R16
+0000cd b70f                      	IN R16,SREG
+0000ce 930f                      	PUSH R16
                                  
                                  	//SBI PORTB,PB5
                                  
-0000c0 e001                      	LDI R16,1
-0000c1 bd06                      	OUT TCNT0,R16
+0000cf e001                      	LDI R16,1
+0000d0 bd06                      	OUT TCNT0,R16
                                  
-0000c2 9533                      	INC counter
-0000c3 3031                      	CPI counter, 1
-0000c4 f451                      	BRNE SALTO
-0000c5 2733                      	CLR counter
+0000d1 9533                      	INC counter
+0000d2 3031                      	CPI counter, 1
+0000d3 f451                      	BRNE SALTO
+0000d4 2733                      	CLR counter
                                  
                                  	;INC segundos
                                  	;CPI segundos,60
                                  	/*SBRC flags,0
                                  	CALL set_hora*/
-0000c6 c001                      	RJMP empieza
-0000c7 c007                      	RJMP SALTO
+0000d5 c001                      	RJMP empieza
+0000d6 c007                      	RJMP SALTO
                                  
                                  /*set_hora:
                                  	CLR count_unidades
@@ -1298,339 +1315,348 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  
                                  
                                  empieza:
-0000c8 2744                      	CLR segundos
-0000c9 9553                      	INC count_unidades
-0000ca e00f                      	LDI R16,0b0000_1111
-0000cb 2305                      	AND R16,count_unidades
-0000cc 300a                      	CPI R16, 0b0000_1010
-0000cd f029                      	BREQ overflow
-0000ce c000                      	RJMP SALTO
+0000d7 2744                      	CLR segundos
+0000d8 9553                      	INC count_unidades
+0000d9 e00f                      	LDI R16,0b0000_1111
+0000da 2305                      	AND R16,count_unidades
+0000db 300a                      	CPI R16, 0b0000_1010
+0000dc f029                      	BREQ overflow
+0000dd c000                      	RJMP SALTO
                                  
                                  SALTO:
-0000cf 910f                      	POP R16
-0000d0 bf0f                      	OUT SREG,R16
-0000d1 910f                      	POP R16
-0000d2 9518                      	RETI
+0000de 910f                      	POP R16
+0000df bf0f                      	OUT SREG,R16
+0000e0 910f                      	POP R16
+0000e1 9518                      	RETI
                                  
                                  overflow:
-0000d3 ef00                      	LDI R16,0b1111_0000
-0000d4 2350                      	AND count_unidades,R16
-0000d5 9563                      	INC count_decenas
-0000d6 e00f                      	LDI R16,0b0000_1111
-0000d7 2306                      	AND R16,count_decenas
-0000d8 3006                      	CPI R16, 0b0000_0110
-0000d9 f009                      	BREQ overflow_decenas
-0000da cff4                      	RJMP SALTO
+0000e2 ef00                      	LDI R16,0b1111_0000
+0000e3 2350                      	AND count_unidades,R16
+0000e4 9563                      	INC count_decenas
+0000e5 e00f                      	LDI R16,0b0000_1111
+0000e6 2306                      	AND R16,count_decenas
+0000e7 3006                      	CPI R16, 0b0000_0110
+0000e8 f009                      	BREQ overflow_decenas
+0000e9 cff4                      	RJMP SALTO
                                  
                                  overflow_decenas:
                                  	;trabajar con unidades de hora
-0000db ef00                      	LDI R16,0b1111_0000
-0000dc 2360                      	AND count_decenas,R16;pomner en 0 las unidades de minutos
-0000dd e00f                      	LDI R16,0b0000_1111
-0000de 9552                      	SWAP count_unidades
-0000df 9553                      	INC count_unidades
-0000e0 2305                      	AND R16,count_unidades
-0000e1 9552                      	SWAP count_unidades
-0000e2 3004                      	CPI R16,0b0000_0100
-0000e3 f051                      	BREQ verificar_hora
-0000e4 300a                      	CPI R16,0b0000_1010
-0000e5 f009                      	BREQ overflow_uhora
-0000e6 cfe8                      	RJMP SALTO
+0000ea ef00                      	LDI R16,0b1111_0000
+0000eb 2360                      	AND count_decenas,R16;pomner en 0 las unidades de minutos
+0000ec e00f                      	LDI R16,0b0000_1111
+0000ed 9552                      	SWAP count_unidades
+0000ee 9553                      	INC count_unidades
+0000ef 2305                      	AND R16,count_unidades
+0000f0 9552                      	SWAP count_unidades
+0000f1 3004                      	CPI R16,0b0000_0100
+0000f2 f051                      	BREQ verificar_hora
+0000f3 300a                      	CPI R16,0b0000_1010
+0000f4 f009                      	BREQ overflow_uhora
+0000f5 cfe8                      	RJMP SALTO
                                  
                                  overflow_uhora:
                                  	;trabajar con decenas de hora
-0000e7 e00f                      	LDI R16,0b0000_1111
-0000e8 2350                      	AND count_unidades,R16
-0000e9 9562                      	SWAP count_decenas
-0000ea 9563                      	INC count_decenas
-0000eb 2306                      	AND R16,count_decenas
-0000ec 9562                      	SWAP count_decenas
-0000ed cfe1                      	RJMP SALTO
+0000f6 e00f                      	LDI R16,0b0000_1111
+0000f7 2350                      	AND count_unidades,R16
+0000f8 9562                      	SWAP count_decenas
+0000f9 9563                      	INC count_decenas
+0000fa 2306                      	AND R16,count_decenas
+0000fb 9562                      	SWAP count_decenas
+0000fc cfe1                      	RJMP SALTO
                                  
                                  verificar_hora:
-0000ee ef00                      	LDI R16,0b1111_0000
-0000ef 2306                      	AND R16,count_decenas
-0000f0 9502                      	SWAP R16
-0000f1 3002                      	CPI R16,0b0000_0010
-0000f2 f009                      	BREQ ultima_hora
-0000f3 cfdb                      	RJMP SALTO
+0000fd ef00                      	LDI R16,0b1111_0000
+0000fe 2306                      	AND R16,count_decenas
+0000ff 9502                      	SWAP R16
+000100 3002                      	CPI R16,0b0000_0010
+000101 f009                      	BREQ ultima_hora
+000102 cfdb                      	RJMP SALTO
                                  
                                  ultima_hora:
-0000f4 e050                      	LDI count_unidades,0b0000_0000
-0000f5 e060                      	LDI count_decenas,0b0000_0000
-0000f6 9593                      	INC dia
-0000f7 2f09                      	MOV R16,dia
-0000f8 3209                      	CPI R16,0b0010_1001//verifica si dia es 29
-0000f9 f041                      	BREQ verificar_feb
-0000fa 3301                      	CPI R16,0b0011_0001//dia 31
-0000fb f069                      	BREQ verificar_mes30
-0000fc 3302                      	CPI R16,0b0011_0010//dia32
-0000fd f0f9                      	BREQ verificar_mes31
-0000fe 700f                      	ANDI R16,0b0000_1111
-0000ff 300a                      	CPI R16,0b0000_1010//dia 9 en mes normal
-000100 f191                      	BREQ overflow_dia
-000101 cfcd                      	RJMP SALTO
+000103 e050                      	LDI count_unidades,0b0000_0000
+000104 e060                      	LDI count_decenas,0b0000_0000
+000105 9593                      	INC dia
+000106 2f09                      	MOV R16,dia
+000107 3209                      	CPI R16,0b0010_1001//verifica si dia es 29
+000108 f041                      	BREQ verificar_feb
+000109 3301                      	CPI R16,0b0011_0001//dia 31
+00010a f069                      	BREQ verificar_mes30
+00010b 3302                      	CPI R16,0b0011_0010//dia32
+00010c f0f9                      	BREQ verificar_mes31
+00010d 700f                      	ANDI R16,0b0000_1111
+00010e 300a                      	CPI R16,0b0000_1010//dia 9 en mes normal
+00010f f191                      	BREQ overflow_dia
+000110 cfcd                      	RJMP SALTO
                                  
                                  verificar_feb:
-000102 2f07                      	MOV R16,mes 
-000103 3002                      	CPI R16,0b0000_0010//verificar si mes =0/2
-000104 f009                      	BREQ febrero
-000105 cfc9                      	RJMP SALTO
+000111 2f07                      	MOV R16,mes 
+000112 3002                      	CPI R16,0b0000_0010//verificar si mes =0/2
+000113 f009                      	BREQ febrero
+000114 cfc9                      	RJMP SALTO
                                  
                                  febrero:
-000106 9573                      	INC mes
-000107 e091                      	LDI dia,0b0000_0001
-000108 cfc6                      	RJMP SALTO
+000115 9573                      	INC mes
+000116 e091                      	LDI dia,0b0000_0001
+000117 cfc6                      	RJMP SALTO
                                  
                                  verificar_mes30:
-000109 2f07                      	MOV R16,mes
-00010a 3004                      	CPI R16,0b0000_0100;verificar si mes es 0/4   
-00010b f071                      	BREQ mes_30
-00010c 3006                      	CPI R16,0b0000_0110;0/6   
-00010d f061                      	BREQ mes_30
-00010e 3009                      	CPI R16,0b0000_1001; 0/9  
-00010f f019                      	BREQ septiembre
-000110 3101                      	CPI R16, 0b0001_0001; 1/1
-000111 f041                      	BREQ mes_30
-000112 cfbc                      	RJMP SALTO
+000118 2f07                      	MOV R16,mes
+000119 3004                      	CPI R16,0b0000_0100;verificar si mes es 0/4   
+00011a f071                      	BREQ mes_30
+00011b 3006                      	CPI R16,0b0000_0110;0/6   
+00011c f061                      	BREQ mes_30
+00011d 3009                      	CPI R16,0b0000_1001; 0/9  
+00011e f019                      	BREQ septiembre
+00011f 3101                      	CPI R16, 0b0001_0001; 1/1
+000120 f041                      	BREQ mes_30
+000121 cfbc                      	RJMP SALTO
                                  
                                  septiembre:
-000113 2f07                      	MOV R16,mes
-000114 9502                      	SWAP R16
-000115 9503                      	INC R16
-000116 9502                      	SWAP R16
-000117 2f70                      	MOV mes,R16
-000118 e091                      	LDI dia,0b0000_0001
-000119 cfb5                      	RJMP SALTO
+000122 2f07                      	MOV R16,mes
+000123 9502                      	SWAP R16
+000124 9503                      	INC R16
+000125 9502                      	SWAP R16
+000126 2f70                      	MOV mes,R16
+000127 e091                      	LDI dia,0b0000_0001
+000128 cfb5                      	RJMP SALTO
                                  
                                  mes_30:
-00011a 9573                      	INC mes
-00011b e091                      	LDI dia,0b0000_0001
-00011c cfb2                      	RJMP SALTO
+000129 9573                      	INC mes
+00012a e091                      	LDI dia,0b0000_0001
+00012b cfb2                      	RJMP SALTO
                                  
                                  verificar_mes31:
-00011d 2f07                      	MOV R16,mes
-00011e 3001                      	CPI R16,0b0000_0001;verificar si mes es 0/1  
-00011f f069                      	BREQ mes_31
-000120 3005                      	CPI R16,0b0000_0101;0/3   
-000121 f059                      	BREQ mes_31
-000122 3005                      	CPI R16,0b0000_0101; 0/5 
-000123 f049                      	BREQ mes_31
-000124 3009                      	CPI R16, 0b0000_1001; 07
-000125 f039                      	BREQ mes_31
-000126 3008                      	CPI R16, 0b0000_1000; 08
-000127 f029                      	BREQ mes_31
-000128 3100                      	CPI R16, 0b0001_0000; 10
-000129 f019                      	BREQ mes_31
-00012a 3102                      	CPI R16, 0b0001_0010; 12
-00012b f021                      	BREQ diciembre
-00012c cfa2                      	RJMP SALTO
+00012c 2f07                      	MOV R16,mes
+00012d 3001                      	CPI R16,0b0000_0001;verificar si mes es 0/1  
+00012e f069                      	BREQ mes_31
+00012f 3005                      	CPI R16,0b0000_0101;0/3   
+000130 f059                      	BREQ mes_31
+000131 3005                      	CPI R16,0b0000_0101; 0/5 
+000132 f049                      	BREQ mes_31
+000133 3009                      	CPI R16, 0b0000_1001; 07
+000134 f039                      	BREQ mes_31
+000135 3008                      	CPI R16, 0b0000_1000; 08
+000136 f029                      	BREQ mes_31
+000137 3100                      	CPI R16, 0b0001_0000; 10
+000138 f019                      	BREQ mes_31
+000139 3102                      	CPI R16, 0b0001_0010; 12
+00013a f021                      	BREQ diciembre
+00013b cfa2                      	RJMP SALTO
                                  
                                  mes_31:
-00012d 9573                      	INC mes
-00012e e091                      	LDI dia,0b0000_0001
-00012f cf9f                      	RJMP SALTO
+00013c 9573                      	INC mes
+00013d e091                      	LDI dia,0b0000_0001
+00013e cf9f                      	RJMP SALTO
                                  
                                  diciembre:
-000130 e071                      	LDI mes,0b0000_0001
-000131 e091                      	LDI dia,0b0000_0001
-000132 cf9c                      	RJMP SALTO
+00013f e071                      	LDI mes,0b0000_0001
+000140 e091                      	LDI dia,0b0000_0001
+000141 cf9c                      	RJMP SALTO
                                  
                                  overflow_dia:
-000133 2f09                      	MOV R16,dia
-000134 7f00                      	ANDI R16,0b1111_0000
-000135 9502                      	SWAP R16
-000136 9503                      	INC R16
-000137 9502                      	SWAP R16
-000138 2f90                      	MOV dia,R16
-000139 cf95                      	RJMP SALTO
+000142 2f09                      	MOV R16,dia
+000143 7f00                      	ANDI R16,0b1111_0000
+000144 9502                      	SWAP R16
+000145 9503                      	INC R16
+000146 9502                      	SWAP R16
+000147 2f90                      	MOV dia,R16
+000148 cf95                      	RJMP SALTO
                                  
                                  
                                  delaybounce:
-00013a ef0a                      	LDI r16,250//250 para notar el valor de muestreo en los display
+000149 ef0a                      	LDI r16,250//250 para notar el valor de muestreo en los display
                                  	delay:
-00013b 950a                      		DEC r16
-00013c f7f1                      		BRNE delay
-00013d 9508                      	RET
+00014a 950a                      		DEC r16
+00014b f7f1                      		BRNE delay
+00014c 9508                      	RET
                                  
                                  //*******************************************************************
                                  //INTERRUPCIÓN DE BOTONES
                                  //*******************************************************************
                                  ISR_PCINT1:
-00013e 930f                      	PUSH R16
-00013f b70f                      	IN R16,SREG
-000140 930f                      	PUSH R16
+00014d 930f                      	PUSH R16
+00014e b70f                      	IN R16,SREG
+00014f 930f                      	PUSH R16
                                  	
-000141 ff27                      	SBRS modo_btn,7
-000142 c002                      	RJMP INT_1
-000143 c005                      	RJMP INT_2
-000144 c070                      	RJMP ISR_POP
+000150 ff27                      	SBRS modo_btn,7
+000151 c002                      	RJMP INT_1
+000152 c005                      	RJMP INT_2
+000153 c077                      	RJMP ISR_POP
                                  	
                                  INT_1:
-000145 e800                      	LDI R16, 0b1000_0000
-000146 2b20                      	OR modo_btn,R16
-000147 b116                      	IN R17,PINC
-000148 c06c                      	RJMP ISR_POP
+000154 e800                      	LDI R16, 0b1000_0000
+000155 2b20                      	OR modo_btn,R16
+000156 b116                      	IN R17,PINC
+000157 c073                      	RJMP ISR_POP
                                  
                                  INT_2:
-000149 e70f                      	LDI R16,0b0111_1111
-00014a 2320                      	AND modo_btn,R16
-00014b 311e                      	CPI R17,0b00001_1110
-00014c f029                      	BREQ btn1
-00014d 311d                      	CPI R17,0b0001_1101
-00014e f079                      	BREQ btn2
-00014f 311b                      	CPI R17,0b00001_1011
-000150 f101                      	BREQ btn3
+000158 e70f                      	LDI R16,0b0111_1111
+000159 2320                      	AND modo_btn,R16
+00015a 311e                      	CPI R17,0b00001_1110
+00015b f029                      	BREQ btn1
+00015c 311d                      	CPI R17,0b0001_1101
+00015d f0a1                      	BREQ btn2
+00015e 311b                      	CPI R17,0b00001_1011
+00015f f129                      	BREQ btn3
                                  	;CPI R17,0b0111
                                  	;BREQ btn4
-000151 c063                      	RJMP ISR_POP
+000160 c06a                      	RJMP ISR_POP
                                  
                                  btn1:
-000152 9a2d                      	SBI PORTB,PB5
-000153 9522                      	SWAP modo_btn
-000154 9523                      	INC modo_btn
-000155 e00f                      	LDI R16, 0b0000_1111
-000156 2302                      	AND R16,modo_btn
-000157 9522                      	SWAP modo_btn
-000158 3005                      	CPI R16,0b0000_0101
-000159 f009                      	BREQ overflow_modo
-00015a c05a                      	RJMP ISR_POP
+000161 9a2d                      	SBI PORTB,PB5
+000162 9522                      	SWAP modo_btn
+000163 9523                      	INC modo_btn
+000164 e00f                      	LDI R16, 0b0000_1111
+000165 2302                      	AND R16,modo_btn
+000166 9522                      	SWAP modo_btn
+000167 3001                      	CPI R16,0b0000_0001
+000168 f019                      	BREQ set_horaconf_clear
+000169 3005                      	CPI R16,0b0000_0101
+00016a f021                      	BREQ overflow_modo
+00016b c05f                      	RJMP ISR_POP
+                                 
+                                 set_horaconf_clear:
+00016c 24ee                      	CLR  uni_conf
+00016d 24ff                      	CLR dec_conf
+00016e cf6f                      	RJMP SALTO
                                  
                                  overflow_modo:
-00015b e00f                      	LDI R16,0b0000_1111
-00015c 2320                      	AND modo_btn,R16
-00015d c057                      	RJMP ISR_POP
+00016f e00f                      	LDI R16,0b0000_1111
+000170 2320                      	AND modo_btn,R16
+000171 c059                      	RJMP ISR_POP
                                  
                                  btn2:
-00015e 2f02                      	MOV R16,modo_btn
-00015f 9502                      	SWAP R16
-000160 700f                      	ANDI R16,0b0000_1111
-000161 3001                      	CPI R16, 0b0000_0001
-000162 f029                      	BREQ cambiar_display
-000163 3003                      	CPI r16,0b0000_0011
-000164 f019                      	BREQ cambiar_display
-000165 3004                      	CPI R16,0b0000_0100
-000166 f009                      	BREQ cambiar_display
-000167 c04d                      	RJMP ISR_POP
+000172 2f02                      	MOV R16,modo_btn
+000173 9502                      	SWAP R16
+000174 700f                      	ANDI R16,0b0000_1111
+000175 3001                      	CPI R16, 0b0000_0001
+000176 f029                      	BREQ cambiar_display
+000177 3003                      	CPI r16,0b0000_0011
+000178 f019                      	BREQ cambiar_display
+000179 3004                      	CPI R16,0b0000_0100
+00017a f009                      	BREQ cambiar_display
+00017b c04f                      	RJMP ISR_POP
                                  cambiar_display:
-000168 9523                      	INC modo_btn
-000169 2f02                      	MOV R16,modo_btn
-00016a 700f                      	ANDI R16,0b0000_1111
-00016b 3005                      	CPI R16,0b0000_0101
-00016c f009                      	BREQ overflow_displays
-00016d c047                      	RJMP ISR_POP
+00017c 9523                      	INC modo_btn
+00017d 2f02                      	MOV R16,modo_btn
+00017e 700f                      	ANDI R16,0b0000_1111
+00017f 3005                      	CPI R16,0b0000_0101
+000180 f009                      	BREQ overflow_displays
+000181 c049                      	RJMP ISR_POP
                                  overflow_displays:
-00016e ef00                      	LDI R16,0b1111_0000
-00016f 2320                      	AND modo_btn,R16
-000170 c044                      	RJMP ISR_POP
+000182 ef00                      	LDI R16,0b1111_0000
+000183 2320                      	AND modo_btn,R16
+000184 c046                      	RJMP ISR_POP
                                  
                                  btn3:
-000171 2f02                      	MOV R16, modo_btn
-000172 9502                      	SWAP R16
-000173 700f                      	ANDI R16,0b0000_1111
-000174 3001                      	CPI R16,0b0000_0001
-000175 f009                      	BREQ configurar_hora
-000176 c03e                      	RJMP ISR_POP
+000185 2f02                      	MOV R16, modo_btn
+000186 9502                      	SWAP R16
+000187 700f                      	ANDI R16,0b0000_1111
+000188 3001                      	CPI R16,0b0000_0001
+000189 f009                      	BREQ configurar_hora
+00018a c040                      	RJMP ISR_POP
                                  
                                  configurar_hora:
-000177 e01f                      	LDI R17, 0b0000_1111
-000178 2312                      	AND R17,modo_btn
-000179 3011                      	CPI R17,1
-00017a f039                      	BREQ cambiar_disp1
-00017b 3012                      	CPI R17,2
-00017c f079                      	BREQ cambiar_disp2
-00017d 3013                      	CPI R17,3
-00017e f0b9                      	BREQ cambiar_disp3
-00017f 3014                      	CPI R17,4
-000180 f149                      	BREQ cambiar_disp4
-000181 cecd                      	RJMP LOOP
+00018b e01f                      	LDI R17, 0b0000_1111
+00018c 2312                      	AND R17,modo_btn
+00018d 3011                      	CPI R17,1
+00018e f039                      	BREQ cambiar_disp1
+00018f 3012                      	CPI R17,2
+000190 f089                      	BREQ cambiar_disp2
+000191 3013                      	CPI R17,3
+000192 f0c9                      	BREQ cambiar_disp3
+000193 3014                      	CPI R17,4
+000194 f159                      	BREQ cambiar_disp4
+000195 ceb9                      	RJMP LOOP
                                  
                                  cambiar_disp1:
-000182 94e3                      	INC uni_conf
-000183 2d1e                      	MOV R17,uni_conf
-000184 701f                      	ANDI R17,0b0000_1111
-000185 301a                      	CPI R17,0b0000_1010
-000186 f009                      	BREQ overflow_disp1
-000187 c02d                      	RJMP ISR_POP
+000196 2d5e                      	MOV count_unidades,uni_conf
+000197 2d6f                      	MOV count_decenas,dec_conf
+000198 94e3                      	INC uni_conf
+000199 2d1e                      	MOV R17,uni_conf
+00019a 701f                      	ANDI R17,0b0000_1111
+00019b 301a                      	CPI R17,0b0000_1010
+00019c f009                      	BREQ overflow_disp1
+00019d c02d                      	RJMP ISR_POP
                                  
                                  overflow_disp1:
-000188 ef00                      	LDI R16,0b1111_0000
-000189 210e                      	AND R16,uni_conf
-00018a 2ee0                      	MOV uni_conf, R16
-00018b c029                      	RJMP ISR_POP
+00019e ef00                      	LDI R16,0b1111_0000
+00019f 210e                      	AND R16,uni_conf
+0001a0 2ee0                      	MOV uni_conf, R16
+0001a1 c029                      	RJMP ISR_POP
                                  
                                  cambiar_disp2:
-00018c 94f3                      	INC dec_conf
-00018d 2d1f                      	MOV R17,dec_conf
-00018e 701f                      	ANDI R17,0b0000_1111
-00018f 3016                      	CPI R17,0b0000_0110
-000190 f009                      	BREQ overflow_disp2
-000191 c023                      	RJMP ISR_POP
+0001a2 94f3                      	INC dec_conf
+0001a3 2d1f                      	MOV R17,dec_conf
+0001a4 701f                      	ANDI R17,0b0000_1111
+0001a5 3016                      	CPI R17,0b0000_0110
+0001a6 f009                      	BREQ overflow_disp2
+0001a7 c023                      	RJMP ISR_POP
                                  
                                  overflow_disp2:
-000192 ef00                      	LDI R16,0b1111_0000
-000193 210f                      	AND R16,dec_conf
-000194 2ef0                      	MOV dec_conf,R16
-000195 c01f                      	RJMP ISR_POP
+0001a8 ef00                      	LDI R16,0b1111_0000
+0001a9 210f                      	AND R16,dec_conf
+0001aa 2ef0                      	MOV dec_conf,R16
+0001ab c01f                      	RJMP ISR_POP
                                  
                                  cambiar_disp3:
-000196 94e2                      	SWAP uni_conf
-000197 94e3                      	INC uni_conf
-000198 2d1e                      	MOV R17,uni_conf
-000199 94e2                      	SWAP uni_conf
-00019a 701f                      	ANDI R17,0b0000_1111
-00019b 3014                      	CPI R17,0b0000_0100
-00019c f019                      	BREQ ver_horaconf
-00019d 301a                      	CPI R17,0b0000_1010
-00019e f039                      	BREQ overflow_disp3
-00019f c015                      	RJMP ISR_POP
+0001ac 94e2                      	SWAP uni_conf
+0001ad 94e3                      	INC uni_conf
+0001ae 2d1e                      	MOV R17,uni_conf
+0001af 94e2                      	SWAP uni_conf
+0001b0 701f                      	ANDI R17,0b0000_1111
+0001b1 3014                      	CPI R17,0b0000_0100
+0001b2 f019                      	BREQ ver_horaconf
+0001b3 301a                      	CPI R17,0b0000_1010
+0001b4 f039                      	BREQ overflow_disp3
+0001b5 c015                      	RJMP ISR_POP
                                  
                                  ver_horaconf:
-0001a0 ef10                      	LDI R17,0b1111_0000
-0001a1 211f                      	AND R17,dec_conf
-0001a2 9512                      	SWAP R17
-0001a3 3012                      	CPI R17,0b0000_0010
-0001a4 c00d                      	RJMP overflow_disp4
-0001a5 c00f                      	RJMP ISR_POP
+0001b6 ef10                      	LDI R17,0b1111_0000
+0001b7 211f                      	AND R17,dec_conf
+0001b8 9512                      	SWAP R17
+0001b9 3012                      	CPI R17,0b0000_0010
+0001ba c00d                      	RJMP overflow_disp4
+0001bb c00f                      	RJMP ISR_POP
                                  
                                  overflow_disp3:
-0001a6 e00f                      	LDI R16,0b0000_1111
-0001a7 210e                      	AND R16,uni_conf
-0001a8 2ee0                      	MOV uni_conf,R16
-0001a9 c00b                      	RJMP ISR_POP
+0001bc e00f                      	LDI R16,0b0000_1111
+0001bd 210e                      	AND R16,uni_conf
+0001be 2ee0                      	MOV uni_conf,R16
+0001bf c00b                      	RJMP ISR_POP
                                  
                                  cambiar_disp4:
-0001aa 94f2                      	SWAP dec_conf
-0001ab 94f3                      	INC dec_conf
-0001ac 2d1f                      	MOV R17,dec_conf
-0001ad 94f2                      	SWAP dec_conf
-0001ae 701f                      	ANDI R17,0b0000_1111
-0001af 3013                      	CPI R17,0b0000_0011
-0001b0 f009                      	BREQ overflow_disp4
-0001b1 c003                      	RJMP ISR_POP
+0001c0 94f2                      	SWAP dec_conf
+0001c1 94f3                      	INC dec_conf
+0001c2 2d1f                      	MOV R17,dec_conf
+0001c3 94f2                      	SWAP dec_conf
+0001c4 701f                      	ANDI R17,0b0000_1111
+0001c5 3013                      	CPI R17,0b0000_0011
+0001c6 f009                      	BREQ overflow_disp4
+0001c7 c003                      	RJMP ISR_POP
                                  
                                  overflow_disp4:
-0001b2 24ff                      	CLR dec_conf
-0001b3 24ee                      	CLR uni_conf
-0001b4 c000                      	RJMP ISR_POP
+0001c8 24ff                      	CLR dec_conf
+0001c9 24ee                      	CLR uni_conf
+0001ca c000                      	RJMP ISR_POP
                                  
                                  ISR_POP:
-0001b5 910f                      	POP R16
-0001b6 bf0f                      	OUT SREG,R16
-0001b7 910f                      	POP R16
-0001b8 9518                      	RETI
+0001cb 910f                      	POP R16
+0001cc bf0f                      	OUT SREG,R16
+0001cd 910f                      	POP R16
+0001ce 9518                      	RETI
                                  
                                  //*******************************************************************
                                  //TABLA DE VALORES
                                  //*******************************************************************
-0001b9 063f
-0001ba 4f5b
-0001bb 6d66
-0001bc 077d
-0001bd 6f7f
-0001be 7c77
-0001bf 5e39
-0001c0 7179                      TABLA7SEG: .DB 0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71;
+0001cf 063f
+0001d0 4f5b
+0001d1 6d66
+0001d2 077d
+0001d3 6f7f
+0001d4 7c77
+0001d5 5e39
+0001d6 7179                      TABLA7SEG: .DB 0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71;
                                  
                                  
 
@@ -1650,39 +1676,39 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega328P" register use summary:
-x  :   0 y  :   0 z  :   5 r0 :   3 r1 :   3 r2 :   3 r3 :   0 r4 :   0 
-r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   3 
-r13:   0 r14:  14 r15:  13 r16: 159 r17:  31 r18:  18 r19:   4 r20:   2 
-r21:  10 r22:  10 r23:  12 r24:  12 r25:  12 r26:   0 r27:   0 r28:   0 
+x  :   0 y  :   0 z  :   5 r0 :   4 r1 :   4 r2 :   4 r3 :   0 r4 :   0 
+r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   4 
+r13:   0 r14:  16 r15:  15 r16: 174 r17:  31 r18:  18 r19:   4 r20:   2 
+r21:  13 r22:  13 r23:  12 r24:  12 r25:  12 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   9 r31:   5 
 Registers used: 19 out of 35 (54.3%)
 
 "ATmega328P" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   4 adiw  :   0 and   :  25 
+.lds  :   0 .sts  :   0 adc   :   0 add   :   4 adiw  :   0 and   :  29 
 andi  :   9 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :  39 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :  40 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   2 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :  15 cbi   :   4 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  15 cls   :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :  16 cbi   :   4 cbr   :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  17 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :  41 cpse  :   0 dec   :   1 eor   :   0 fmul  :   0 fmuls :   0 
+cpi   :  42 cpse  :   0 dec   :   1 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   3 inc   :  17 jmp   :   3 
-ld    :   0 ldd   :   0 ldi   :  62 lds   :   0 lpm   :  10 lsl   :   0 
-lsr   :   0 mov   :  26 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   2 or    :   1 ori   :   0 out   :  18 pop   :   4 
-push  :   4 rcall :   0 ret   :   3 reti  :   2 rjmp  :  48 rol   :   0 
+ld    :   0 ldd   :   0 ldi   :  66 lds   :   0 lpm   :  10 lsl   :   0 
+lsr   :   0 mov   :  32 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
+neg   :   0 nop   :   1 or    :   1 ori   :   0 out   :  18 pop   :   4 
+push  :   4 rcall :   0 ret   :   3 reti  :   2 rjmp  :  49 rol   :   0 
 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   5 sbic  :   0 sbis  :   0 
 sbiw  :   0 sbr   :   0 sbrc  :   3 sbrs  :   1 sec   :   0 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   4 
-sub   :   0 subi  :   0 swap  :  24 tst   :   0 wdr   :   0 
+sub   :   0 subi  :   0 swap  :  26 tst   :   0 wdr   :   0 
 Instructions used: 30 out of 113 (26.5%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000382    826     16    842   32768   2.6%
+[.cseg] 0x000000 0x0003ae    870     16    886   32768   2.7%
 [.dseg] 0x000100 0x000100      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 

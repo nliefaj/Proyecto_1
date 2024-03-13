@@ -138,13 +138,7 @@ ESTADOx1:
 ESTADO11: 
 	nop
 	RJMP LOOP
-ESTADO10:
-	nop 
-	RJMP LOOP
-ESTADOx0:
-	SBRC modo_btn,5
-	RJMP ESTADO10 ;muestra la fecha
-	//aquí se ejecuta el estado 00_mostrar hora
+ESTADO10:;muestra fecha
 	LDI R16,0b0000_1111
 	AND R16,dia
 	MOV R0,R16; primer display
@@ -160,6 +154,29 @@ ESTADOx0:
 
 	LDI R16,0b1111_0000
 	AND R16,mes
+	SWAP R16
+	MOV R12,R16 ;cuarto display
+	CALL display
+	RJMP LOOP
+ESTADOx0:
+	SBRC modo_btn,5
+	RJMP ESTADO10 ;muestra la fecha
+	//aqui se ejecuta el estado 00_mostrar hora
+	LDI R16,0b0000_1111
+	AND R16,count_unidades
+	MOV R0,R16; primer display
+
+	LDI R16,0b0000_1111
+	AND R16,count_decenas
+	MOV R1,R16;segundo display
+
+	LDI R16,0b1111_0000
+	AND R16,count_unidades
+	SWAP R16
+	MOV R2,R16;tercer diplay
+
+	LDI R16,0b1111_0000
+	AND R16,count_decenas
 	SWAP R16
 	MOV R12,R16 ;cuarto display
 	CALL display
@@ -461,9 +478,16 @@ btn1:
 	LDI R16, 0b0000_1111
 	AND R16,modo_btn
 	SWAP modo_btn
+	CPI R16,0b0000_0001
+	BREQ set_horaconf_clear
 	CPI R16,0b0000_0101
 	BREQ overflow_modo
 	RJMP ISR_POP
+
+set_horaconf_clear:
+	CLR  uni_conf
+	CLR dec_conf
+	RJMP SALTO
 
 overflow_modo:
 	LDI R16,0b0000_1111
@@ -515,6 +539,8 @@ configurar_hora:
 	RJMP LOOP
 
 cambiar_disp1:
+	MOV count_unidades,uni_conf
+	MOV count_decenas,dec_conf
 	INC uni_conf
 	MOV R17,uni_conf
 	ANDI R17,0b0000_1111

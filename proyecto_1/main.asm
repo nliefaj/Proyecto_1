@@ -33,10 +33,9 @@
 .DEF segundos=R20
 .DEF count_unidades=R21
 .DEF count_decenas=R22
-;.DEF count_umin=R23
 ;registro 24 único para mostrar valores
 .DEF dia=R25
-.DEF mes=R26
+.DEF mes=R23
 
 //*******************************************************************
 //STACK
@@ -104,7 +103,7 @@ SETUP:
 	CLR dec_conf
 	CLR modo_btn
 	LDI dia,0b000_0001
-	LDI mes,0b001_0000
+	LDI mes,0b000_0001
 
 
 LOOP:
@@ -147,20 +146,20 @@ ESTADOx0:
 	RJMP ESTADO10 ;muestra la fecha
 	//aquí se ejecuta el estado 00_mostrar hora
 	LDI R16,0b0000_1111
-	AND R16,count_unidades
+	AND R16,dia
 	MOV R0,R16; primer display
 
-	LDI R16,0b0000_1111
-	AND R16,count_decenas
+	LDI R16,0b1111_0000
+	AND R16,dia
+	SWAP R16
 	MOV R1,R16;segundo display
 
-	LDI R16,0b1111_0000
-	AND R16,count_unidades
-	SWAP R16
+	LDI R16,0b0000_1111
+	AND R16,mes
 	MOV R2,R16;tercer diplay
 
 	LDI R16,0b1111_0000
-	AND R16,count_decenas
+	AND R16,mes
 	SWAP R16
 	MOV R12,R16 ;cuarto display
 	CALL display
@@ -330,13 +329,15 @@ ultima_hora:
 	LDI count_decenas,0b0000_0000
 	INC dia
 	MOV R16,dia
-	ANDI R16,0b0000_1111
-	CPI R16,0b0000_1001//verifica si dia es 
+	CPI R16,0b0010_1001//verifica si dia es 29
 	BREQ verificar_feb
-	CPI R16,0b0000_0001
+	CPI R16,0b0011_0001//dia 31
 	BREQ verificar_mes30
-	CPI R16,0b0000_0010
+	CPI R16,0b0011_0010//dia32
 	BREQ verificar_mes31
+	ANDI R16,0b0000_1111
+	CPI R16,0b0000_1010//dia 9 en mes normal
+	BREQ overflow_dia
 	RJMP SALTO
 
 verificar_feb:
@@ -350,12 +351,12 @@ febrero:
 	LDI dia,0b0000_0001
 	RJMP SALTO
 
-verificar_mes30
+verificar_mes30:
 	MOV R16,mes
 	CPI R16,0b0000_0100;verificar si mes es 0/4   
-	BREQ mes30
+	BREQ mes_30
 	CPI R16,0b0000_0110;0/6   
-	BREQ mes30
+	BREQ mes_30
 	CPI R16,0b0000_1001; 0/9  
 	BREQ septiembre
 	CPI R16, 0b0001_0001; 1/1
@@ -371,7 +372,7 @@ septiembre:
 	LDI dia,0b0000_0001
 	RJMP SALTO
 
-mes30:
+mes_30:
 	INC mes
 	LDI dia,0b0000_0001
 	RJMP SALTO
@@ -379,9 +380,9 @@ mes30:
 verificar_mes31:
 	MOV R16,mes
 	CPI R16,0b0000_0001;verificar si mes es 0/1  
-	BREQ mes31
+	BREQ mes_31
 	CPI R16,0b0000_0101;0/3   
-	BREQ mes31
+	BREQ mes_31
 	CPI R16,0b0000_0101; 0/5 
 	BREQ mes_31
 	CPI R16, 0b0000_1001; 07
@@ -404,10 +405,14 @@ diciembre:
 	LDI dia,0b0000_0001
 	RJMP SALTO
 
-
-
-overflow_udia:
-	//trabajar con decenas de dias 0b1111_xxxx
+overflow_dia:
+	MOV R16,dia
+	ANDI R16,0b1111_0000
+	SWAP R16
+	INC R16
+	SWAP R16
+	MOV dia,R16
+	RJMP SALTO
 
 
 delaybounce:

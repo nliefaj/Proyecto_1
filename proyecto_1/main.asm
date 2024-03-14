@@ -224,7 +224,7 @@ ESTADO11:
 	LDI R16,0b1111_0000
 	AND R16,mes
 	SWAP R16
-	MOV R12,R16 ;cuarto display
+	MOV R3,R16 ;cuarto display
 	CALL display
 	JMP LOOP
 ESTADO10:;muestra fecha
@@ -245,7 +245,7 @@ ESTADO10:;muestra fecha
 	LDI R16,0b1111_0000
 	AND R16,mes
 	SWAP R16
-	MOV R12,R16 ;cuarto display
+	MOV R3,R16 ;cuarto display
 	CALL display
 	JMP LOOP
 ESTADOx0:
@@ -569,8 +569,8 @@ delaybounce:
 	LDI R16,217
 	OUT TCNT2,R16
 
-	INC counter
-	CPI counter, 217
+	INC counter2
+	CPI counter2, 217
 	BRNE TIMER2_POP
 	CLR counter
 
@@ -867,6 +867,8 @@ cambiar_disp1_f:
 	ANDI R16,0b0000_1111
 	CPI R16,0b0000_1010
 	BREQ overflow_disp1_f
+	MOV dia,dia_config
+	MOV mes,mes_config
 	JMP ISR_POP
 overflow_disp1_f:
 	MOV R16,dia_config
@@ -885,6 +887,8 @@ cambiar_disp2_f:
 	BREQ no_mas_de_31d
 	CPI R16,0b0000_0100
 	BREQ overflow_disp2_f
+	MOV dia,dia_config
+	MOV mes,mes_config
 	JMP ISR_POP
 no_mas_de_31d:
 	MOV R17,mes_config
@@ -939,6 +943,8 @@ cambiar_disp3_f:
 	BREQ overflow_disp3_f
 	CPI R17,0b0000_0011
 	BREQ overflow_mes_hasta_12
+	MOV dia,dia_config
+	MOV mes,mes_config
 	JMP ISR_POP
 overflow_mes_hasta_12:
 	MOV R16,mes_config
@@ -958,6 +964,8 @@ cambiar_disp4_f:
 	MOV R16,mes_config
 	ANDI R16,0b0000_1111
 	MOV mes_config,R16
+	MOV dia,dia_config
+	MOV mes,mes_config
 	JMP ISR_POP
 poner1_decmes:
 	SWAP mes_config

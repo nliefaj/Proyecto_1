@@ -41,6 +41,7 @@
 .DEF dia_config=R11
 .DEF alarma_uni=R12
 .DEF alarma_dec=R13
+.DEF counter2=R5
 
 //*******************************************************************
 //STACK
@@ -115,6 +116,7 @@ SETUP:
 	;CLR count_state
 	;CLR count_al_mode
 	CLR count_unidades
+	CLR counter2
 	CLR count_decenas
 	CLR counter
 	CLR segundos
@@ -248,12 +250,22 @@ ESTADO10:;muestra fecha
 	MOV R3,R16 ;cuarto display
 	CALL display
 	JMP LOOP
+apagar_prender:
+	CLR counter2
+	SBIC PORTB,PB4
+	CBI PORTB,PB4
+    SBIS PORTB,PB4
+	SBI PORTB,PB4
+	JMP ESTADOx0
 ESTADOx0:
 	SBRC modo_btn,5
 	JMP ESTADO10 ;muestra la fecha
 	SBRC modo_btn,6; pregunto si el bit 6 esta en 0, si sí entonces muestra el reloj normal, sino significa que esta en modo config alamra
 	JMP ALARMA 
 	//aqui se ejecuta el estado 00_mostrar hora
+	MOV R16,counter2
+	CPI R16,50
+	BREQ apagar_prender
 	CBI PORTB,PB4
 	LDI R16,0b0000_1111
 	AND R16,count_unidades
@@ -366,6 +378,7 @@ ISR_TIMER:
 	OUT TCNT0,R16
 
 	INC counter
+	INC counter2
 	CPI counter, 178
 	BRNE SALTO
 	CLR counter

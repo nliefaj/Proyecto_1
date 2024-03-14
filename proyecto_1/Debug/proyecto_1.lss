@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Thu Mar 14 14:43:54 2024
+AVRASM ver. 2.2.8  C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm Thu Mar 14 14:58:42 2024
 
 [builtin](2): Including file 'D:/microchip_studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.asm(11): Including file 'D:/microchip_studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -1047,9 +1047,9 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  .org 0x00
 000000 940c 0026                 	JMP MAIN			//Vector reset
                                  .org 0x08				//Vector interrupçion puerto c (entrada de los botones)
-000008 940c 01b1                 	JMP ISR_PCINT1
+000008 940c 01bd                 	JMP ISR_PCINT1
                                  .org 0x0020 //interrupción timer0
-000020 940c 0117                 	JMP ISR_TIMER
+000020 940c 0122                 	JMP ISR_TIMER
                                  ;.org 0x0012 //interrupción timer0
                                  ;	JMP ISR_TIMER2
                                  //*******************************************************************
@@ -1072,6 +1072,7 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  .DEF dia_config=R11
                                  .DEF alarma_uni=R12
                                  .DEF alarma_dec=R13
+                                 .DEF counter2=R5
                                  
                                  //*******************************************************************
                                  //STACK
@@ -1090,7 +1091,7 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
 000029 bf1e                      	OUT SPH,R17
                                  
 00002a e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
-00002b e7e6                      	LDI ZL, LOW(TABLA7SEG<<1)
+00002b e8ee                      	LDI ZL, LOW(TABLA7SEG<<1)
 00002c 9104                      	LPM R16,Z
                                  
                                  SETUP:
@@ -1138,7 +1139,7 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
 000040 e000                      	LDI R16,0
 000041 9300 00c1                 	STS UCSR0B,R16
                                  
-000043 940e 0112                 	CALL delayT0
+000043 940e 011d                 	CALL delayT0
                                  	;CALL delayT2
                                  
 000045 9478                      	SEI //habilitamos interrupcoines
@@ -1146,222 +1147,233 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  	;CLR count_state
                                  	;CLR count_al_mode
 000046 2755                      	CLR count_unidades
-000047 2766                      	CLR count_decenas
-000048 2733                      	CLR counter
-000049 2744                      	CLR segundos
-00004a 24ee                      	CLR uni_conf ;contador para cambiar displays
-00004b 24ff                      	CLR dec_conf
-00004c 2722                      	CLR modo_btn
-00004d 24aa                      	CLR mes_config
-00004e 24bb                      	CLR dia_config
-00004f 24cc                      	CLR alarma_uni
-000050 24dd                      	CLR alarma_dec
-000051 e091                      	LDI dia,0b000_0001
-000052 e071                      	LDI mes,0b000_0001
+000047 2455                      	CLR counter2
+000048 2766                      	CLR count_decenas
+000049 2733                      	CLR counter
+00004a 2744                      	CLR segundos
+00004b 24ee                      	CLR uni_conf ;contador para cambiar displays
+00004c 24ff                      	CLR dec_conf
+00004d 2722                      	CLR modo_btn
+00004e 24aa                      	CLR mes_config
+00004f 24bb                      	CLR dia_config
+000050 24cc                      	CLR alarma_uni
+000051 24dd                      	CLR alarma_dec
+000052 e091                      	LDI dia,0b000_0001
+000053 e071                      	LDI mes,0b000_0001
                                  
                                  
                                  LOOP:
                                  	//enciende el display que tiene que mostrar y deja que los valores se muestren a tiempo completo
-000053 fcd7                      	SBRC alarma_dec,7
-000054 940c 005d                 	JMP alarma_activada
-000056 fd24                      	SBRC modo_btn,4
-000057 940c 0080                 	JMP ESTADOx1
-000059 940c 00be                 	JMP ESTADOx0
-00005b 940c 0053                 	JMP LOOP
+000054 fcd7                      	SBRC alarma_dec,7
+000055 940c 005e                 	JMP alarma_activada
+000057 fd24                      	SBRC modo_btn,4
+000058 940c 0081                 	JMP ESTADOx1
+00005a 940c 00c6                 	JMP ESTADOx0
+00005c 940c 0054                 	JMP LOOP
                                  alarma_activada:
-00005d 2f05                      	MOV R16,count_unidades
-00005e 2d1c                      	MOV R17,alarma_uni
-00005f 1b01                      	SUB R16,R17
-000060 3000                      	CPI R16,0b0000_0000
-000061 f414                      	BRGE evaluar_hora_al
-000062 940c 0053                 	JMP LOOP
+00005e 2f05                      	MOV R16,count_unidades
+00005f 2d1c                      	MOV R17,alarma_uni
+000060 1b01                      	SUB R16,R17
+000061 3000                      	CPI R16,0b0000_0000
+000062 f414                      	BRGE evaluar_hora_al
+000063 940c 0054                 	JMP LOOP
                                  
                                  evaluar_hora_al:
-000064 2f06                      	MOV R16,count_decenas
-000065 2d1d                      	MOV R17,alarma_dec
-000066 1b01                      	SUB R16,R17
-000067 3000                      	CPI R16,0b0000_0000
-000068 f414                      	BRGE prender_buzz
-000069 940c 0053                 	JMP LOOP
+000065 2f06                      	MOV R16,count_decenas
+000066 2d1d                      	MOV R17,alarma_dec
+000067 1b01                      	SUB R16,R17
+000068 3000                      	CPI R16,0b0000_0000
+000069 f414                      	BRGE prender_buzz
+00006a 940c 0054                 	JMP LOOP
                                  
                                  prender_buzz:
-00006b 9a2c                      	SBI PORTB,PB4
-00006c cfe6                      	RJMP LOOP
+00006c 9a2c                      	SBI PORTB,PB4
+00006d cfe6                      	RJMP LOOP
                                  
                                  ALARMA:
-00006d 9a2c                      	SBI PORTB,PB4
-00006e e00f                      	LDI R16,0b0000_1111
-00006f 210c                      	AND R16,alarma_uni
-000070 2e00                      	MOV R0,R16; primer display
+00006e 9a2c                      	SBI PORTB,PB4
+00006f e00f                      	LDI R16,0b0000_1111
+000070 210c                      	AND R16,alarma_uni
+000071 2e00                      	MOV R0,R16; primer display
                                  
-000071 e00f                      	LDI R16,0b0000_1111
-000072 210d                      	AND R16,alarma_dec
-000073 2e10                      	MOV R1,R16;segundo display
+000072 e00f                      	LDI R16,0b0000_1111
+000073 210d                      	AND R16,alarma_dec
+000074 2e10                      	MOV R1,R16;segundo display
                                  
-000074 ef00                      	LDI R16,0b1111_0000
-000075 210c                      	AND R16,alarma_uni
-000076 9502                      	SWAP R16
-000077 2e20                      	MOV R2,R16;tercer diplay
+000075 ef00                      	LDI R16,0b1111_0000
+000076 210c                      	AND R16,alarma_uni
+000077 9502                      	SWAP R16
+000078 2e20                      	MOV R2,R16;tercer diplay
                                  
-000078 ef00                      	LDI R16,0b1111_0000
-000079 210d                      	AND R16,alarma_dec
-00007a 9502                      	SWAP R16
-00007b 2e30                      	MOV R3,R16 ;cuarto display
-00007c 940e 00d7                 	CALL display
-00007e 940c 0053                 	JMP LOOP
+000079 ef00                      	LDI R16,0b1111_0000
+00007a 210d                      	AND R16,alarma_dec
+00007b 9502                      	SWAP R16
+00007c 2e30                      	MOV R3,R16 ;cuarto display
+00007d 940e 00e2                 	CALL display
+00007f 940c 0054                 	JMP LOOP
                                  ESTADOx1:
-000080 fd25                      	SBRC modo_btn,5
-000081 940c 0096                 	JMP ESTADO11 //en este estado se congigura la fecha
+000081 fd25                      	SBRC modo_btn,5
+000082 940c 0097                 	JMP ESTADO11 //en este estado se congigura la fecha
                                  	//realiza el estado 01-->configurar hora
-000083 9a2c                      	SBI PORTB,PB4
-000084 e00f                      	LDI R16,0b0000_1111
-000085 210e                      	AND R16,uni_conf
-000086 2e00                      	MOV R0,R16; primer display
+000084 9a2c                      	SBI PORTB,PB4
+000085 e00f                      	LDI R16,0b0000_1111
+000086 210e                      	AND R16,uni_conf
+000087 2e00                      	MOV R0,R16; primer display
                                  
-000087 e00f                      	LDI R16,0b0000_1111
-000088 210f                      	AND R16,dec_conf
-000089 2e10                      	MOV R1,R16;segundo display
+000088 e00f                      	LDI R16,0b0000_1111
+000089 210f                      	AND R16,dec_conf
+00008a 2e10                      	MOV R1,R16;segundo display
                                  
-00008a ef00                      	LDI R16,0b1111_0000
-00008b 210e                      	AND R16,uni_conf
-00008c 9502                      	SWAP R16
-00008d 2e20                      	MOV R2,R16;tercer diplay
+00008b ef00                      	LDI R16,0b1111_0000
+00008c 210e                      	AND R16,uni_conf
+00008d 9502                      	SWAP R16
+00008e 2e20                      	MOV R2,R16;tercer diplay
                                  
-00008e ef00                      	LDI R16,0b1111_0000
-00008f 210f                      	AND R16,dec_conf
-000090 9502                      	SWAP R16
-000091 2e30                      	MOV R3,R16 ;cuarto display
-000092 940e 00d7                 	CALL display
-000094 940c 0053                 	JMP LOOP
+00008f ef00                      	LDI R16,0b1111_0000
+000090 210f                      	AND R16,dec_conf
+000091 9502                      	SWAP R16
+000092 2e30                      	MOV R3,R16 ;cuarto display
+000093 940e 00e2                 	CALL display
+000095 940c 0054                 	JMP LOOP
                                  ESTADO11: 
                                  	//configura fecha
-000096 b103                      	IN R16,PINB
-000097 6100                      	ORI R16,0b0001_0000
-000098 b905                      	OUT PORTB,R16
+000097 b103                      	IN R16,PINB
+000098 6100                      	ORI R16,0b0001_0000
+000099 b905                      	OUT PORTB,R16
                                  
-000099 e00f                      	LDI R16,0b0000_1111
-00009a 210b                      	AND R16,dia_config
-00009b 2e00                      	MOV R0,R16; primer display
+00009a e00f                      	LDI R16,0b0000_1111
+00009b 210b                      	AND R16,dia_config
+00009c 2e00                      	MOV R0,R16; primer display
                                  
-00009c ef00                      	LDI R16,0b1111_0000
-00009d 210b                      	AND R16,dia_config
-00009e 9502                      	SWAP R16
-00009f 2e10                      	MOV R1,R16;segundo display
+00009d ef00                      	LDI R16,0b1111_0000
+00009e 210b                      	AND R16,dia_config
+00009f 9502                      	SWAP R16
+0000a0 2e10                      	MOV R1,R16;segundo display
                                  
-0000a0 e00f                      	LDI R16,0b0000_1111
-0000a1 210a                      	AND R16,mes_config
-0000a2 2e20                      	MOV R2,R16;tercer diplay
+0000a1 e00f                      	LDI R16,0b0000_1111
+0000a2 210a                      	AND R16,mes_config
+0000a3 2e20                      	MOV R2,R16;tercer diplay
                                  
-0000a3 ef00                      	LDI R16,0b1111_0000
-0000a4 2307                      	AND R16,mes
-0000a5 9502                      	SWAP R16
-0000a6 2e30                      	MOV R3,R16 ;cuarto display
-0000a7 940e 00d7                 	CALL display
-0000a9 940c 0053                 	JMP LOOP
+0000a4 ef00                      	LDI R16,0b1111_0000
+0000a5 2307                      	AND R16,mes
+0000a6 9502                      	SWAP R16
+0000a7 2e30                      	MOV R3,R16 ;cuarto display
+0000a8 940e 00e2                 	CALL display
+0000aa 940c 0054                 	JMP LOOP
                                  ESTADO10:;muestra fecha
-0000ab 982c                      	CBI PORTB,PB4
-0000ac e00f                      	LDI R16,0b0000_1111
-0000ad 2309                      	AND R16,dia
-0000ae 2e00                      	MOV R0,R16; primer display
+0000ac 982c                      	CBI PORTB,PB4
+0000ad e00f                      	LDI R16,0b0000_1111
+0000ae 2309                      	AND R16,dia
+0000af 2e00                      	MOV R0,R16; primer display
                                  
-0000af ef00                      	LDI R16,0b1111_0000
-0000b0 2309                      	AND R16,dia
-0000b1 9502                      	SWAP R16
-0000b2 2e10                      	MOV R1,R16;segundo display
+0000b0 ef00                      	LDI R16,0b1111_0000
+0000b1 2309                      	AND R16,dia
+0000b2 9502                      	SWAP R16
+0000b3 2e10                      	MOV R1,R16;segundo display
                                  
-0000b3 e00f                      	LDI R16,0b0000_1111
-0000b4 2307                      	AND R16,mes
-0000b5 2e20                      	MOV R2,R16;tercer diplay
+0000b4 e00f                      	LDI R16,0b0000_1111
+0000b5 2307                      	AND R16,mes
+0000b6 2e20                      	MOV R2,R16;tercer diplay
                                  
-0000b6 ef00                      	LDI R16,0b1111_0000
-0000b7 2307                      	AND R16,mes
-0000b8 9502                      	SWAP R16
-0000b9 2e30                      	MOV R3,R16 ;cuarto display
-0000ba 940e 00d7                 	CALL display
-0000bc 940c 0053                 	JMP LOOP
+0000b7 ef00                      	LDI R16,0b1111_0000
+0000b8 2307                      	AND R16,mes
+0000b9 9502                      	SWAP R16
+0000ba 2e30                      	MOV R3,R16 ;cuarto display
+0000bb 940e 00e2                 	CALL display
+0000bd 940c 0054                 	JMP LOOP
+                                 apagar_prender:
+0000bf 2455                      	CLR counter2
+0000c0 992c                      	SBIC PORTB,PB4
+0000c1 982c                      	CBI PORTB,PB4
+0000c2 9b2c                          SBIS PORTB,PB4
+0000c3 9a2c                      	SBI PORTB,PB4
+0000c4 940c 00c6                 	JMP ESTADOx0
                                  ESTADOx0:
-0000be fd25                      	SBRC modo_btn,5
-0000bf 940c 00ab                 	JMP ESTADO10 ;muestra la fecha
-0000c1 fd26                      	SBRC modo_btn,6; pregunto si el bit 6 esta en 0, si sí entonces muestra el reloj normal, sino significa que esta en modo config alamra
-0000c2 940c 006d                 	JMP ALARMA 
+0000c6 fd25                      	SBRC modo_btn,5
+0000c7 940c 00ac                 	JMP ESTADO10 ;muestra la fecha
+0000c9 fd26                      	SBRC modo_btn,6; pregunto si el bit 6 esta en 0, si sí entonces muestra el reloj normal, sino significa que esta en modo config alamra
+0000ca 940c 006e                 	JMP ALARMA 
                                  	//aqui se ejecuta el estado 00_mostrar hora
-0000c4 982c                      	CBI PORTB,PB4
-0000c5 e00f                      	LDI R16,0b0000_1111
-0000c6 2305                      	AND R16,count_unidades
-0000c7 2e00                      	MOV R0,R16; primer display
+0000cc 2d05                      	MOV R16,counter2
+0000cd 3302                      	CPI R16,50
+0000ce f381                      	BREQ apagar_prender
+0000cf 982c                      	CBI PORTB,PB4
+0000d0 e00f                      	LDI R16,0b0000_1111
+0000d1 2305                      	AND R16,count_unidades
+0000d2 2e00                      	MOV R0,R16; primer display
                                  
-0000c8 e00f                      	LDI R16,0b0000_1111
-0000c9 2306                      	AND R16,count_decenas
-0000ca 2e10                      	MOV R1,R16;segundo display
+0000d3 e00f                      	LDI R16,0b0000_1111
+0000d4 2306                      	AND R16,count_decenas
+0000d5 2e10                      	MOV R1,R16;segundo display
                                  
-0000cb ef00                      	LDI R16,0b1111_0000
-0000cc 2305                      	AND R16,count_unidades
-0000cd 9502                      	SWAP R16
-0000ce 2e20                      	MOV R2,R16;tercer diplay
+0000d6 ef00                      	LDI R16,0b1111_0000
+0000d7 2305                      	AND R16,count_unidades
+0000d8 9502                      	SWAP R16
+0000d9 2e20                      	MOV R2,R16;tercer diplay
                                  
-0000cf ef00                      	LDI R16,0b1111_0000
-0000d0 2306                      	AND R16,count_decenas
-0000d1 9502                      	SWAP R16
-0000d2 2e30                      	MOV R3,R16 ;cuarto display
-0000d3 940e 00d7                 	CALL display
-0000d5 940c 0053                 	JMP LOOP
+0000da ef00                      	LDI R16,0b1111_0000
+0000db 2306                      	AND R16,count_decenas
+0000dc 9502                      	SWAP R16
+0000dd 2e30                      	MOV R3,R16 ;cuarto display
+0000de 940e 00e2                 	CALL display
+0000e0 940c 0054                 	JMP LOOP
                                  
                                  display:
                                  	//MUESTRA EL RELOJ NORMAL
-0000d7 9a28                      	SBI PORTB,PB0 
-0000d8 e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
-0000d9 e7e6                      	LDI ZL, LOW(TABLA7SEG<<1)
-0000da 0de0                      	ADD ZL,R0
-0000db 2788                      	CLR R24
-0000dc 9184                      	LPM R24,Z //Load from program memory R16
-0000dd b98b                      	OUT PORTD,R24
-0000de 940e 01ad                 	CALL delaybounce
-0000e0 9828                      	CBI PORTB,PB0
-0000e1 940e 01ad                 	CALL delaybounce
-0000e3 940e 01ad                 	CALL delaybounce
+0000e2 9a28                      	SBI PORTB,PB0 
+0000e3 e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
+0000e4 e8ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+0000e5 0de0                      	ADD ZL,R0
+0000e6 2788                      	CLR R24
+0000e7 9184                      	LPM R24,Z //Load from program memory R16
+0000e8 b98b                      	OUT PORTD,R24
+0000e9 940e 01b9                 	CALL delaybounce
+0000eb 9828                      	CBI PORTB,PB0
+0000ec 940e 01b9                 	CALL delaybounce
+0000ee 940e 01b9                 	CALL delaybounce
                                  
                                  	//bloque para decenas de minuto
-0000e5 9a29                      	SBI PORTB,PB1
-0000e6 e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
-0000e7 e7e6                      	LDI ZL, LOW(TABLA7SEG<<1)
-0000e8 0de1                      	ADD ZL,R1
-0000e9 2788                      	CLR R24
-0000ea 9184                      	LPM R24,Z //Load from program memory R16
-0000eb b98b                      	OUT PORTD,R24
-0000ec 940e 01ad                 	CALL delaybounce
-0000ee 9829                      	CBI PORTB,PB1
-0000ef 940e 01ad                 	CALL delaybounce
-0000f1 940e 01ad                 	CALL delaybounce
+0000f0 9a29                      	SBI PORTB,PB1
+0000f1 e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
+0000f2 e8ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+0000f3 0de1                      	ADD ZL,R1
+0000f4 2788                      	CLR R24
+0000f5 9184                      	LPM R24,Z //Load from program memory R16
+0000f6 b98b                      	OUT PORTD,R24
+0000f7 940e 01b9                 	CALL delaybounce
+0000f9 9829                      	CBI PORTB,PB1
+0000fa 940e 01b9                 	CALL delaybounce
+0000fc 940e 01b9                 	CALL delaybounce
                                  
                                  	//bloque para unidades de hora
-0000f3 9a2a                      	SBI PORTB,PB2
-0000f4 9502                      	SWAP R16
-0000f5 e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
-0000f6 e7e6                      	LDI ZL, LOW(TABLA7SEG<<1)
-0000f7 0de2                      	ADD ZL,R2
-0000f8 2788                      	CLR R24
-0000f9 9184                      	LPM R24,Z //Load from program memory R16
-0000fa b98b                      	OUT PORTD,R24
-0000fb 940e 01ad                 	CALL delaybounce
-0000fd 982a                      	CBI PORTB,PB2
-0000fe 940e 01ad                 	CALL delaybounce
-000100 940e 01ad                 	CALL delaybounce
+0000fe 9a2a                      	SBI PORTB,PB2
+0000ff 9502                      	SWAP R16
+000100 e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
+000101 e8ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+000102 0de2                      	ADD ZL,R2
+000103 2788                      	CLR R24
+000104 9184                      	LPM R24,Z //Load from program memory R16
+000105 b98b                      	OUT PORTD,R24
+000106 940e 01b9                 	CALL delaybounce
+000108 982a                      	CBI PORTB,PB2
+000109 940e 01b9                 	CALL delaybounce
+00010b 940e 01b9                 	CALL delaybounce
                                  
                                  	//bloque para decenas de hora
-000102 9a2b                      	SBI PORTB,PB3
-000103 9502                      	SWAP R16
-000104 e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
-000105 e7e6                      	LDI ZL, LOW(TABLA7SEG<<1)
-000106 0de3                      	ADD ZL,R3
-000107 2788                      	CLR R24
-000108 9184                      	LPM R24,Z //Load from program memory R16
-000109 b98b                      	OUT PORTD,R24
-00010a 940e 01ad                 	CALL delaybounce
-00010c 982b                      	CBI PORTB,PB3
-00010d 940e 01ad                 	CALL delaybounce
-00010f 940e 01ad                 	CALL delaybounce
+00010d 9a2b                      	SBI PORTB,PB3
+00010e 9502                      	SWAP R16
+00010f e0f7                      	LDI ZH, HIGH(TABLA7SEG<<1)
+000110 e8ee                      	LDI ZL, LOW(TABLA7SEG<<1)
+000111 0de3                      	ADD ZL,R3
+000112 2788                      	CLR R24
+000113 9184                      	LPM R24,Z //Load from program memory R16
+000114 b98b                      	OUT PORTD,R24
+000115 940e 01b9                 	CALL delaybounce
+000117 982b                      	CBI PORTB,PB3
+000118 940e 01b9                 	CALL delaybounce
+00011a 940e 01b9                 	CALL delaybounce
                                  
-000111 9508                      	RET
+00011c 9508                      	RET
                                  	
                                  	//bloque unidades de minuto
                                  
@@ -1371,13 +1383,13 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  //*******************************************************************
                                  
                                  delayT0:
-000112 e005                      	LDI R16, (1 << CS02) | (1 << CS00)
-000113 bd05                      	OUT TCCR0B, R16
+00011d e005                      	LDI R16, (1 << CS02) | (1 << CS00)
+00011e bd05                      	OUT TCCR0B, R16
                                  
-000114 eb02                      	LDI R16,178
-000115 bd06                      	OUT TCNT0, R16
+00011f eb02                      	LDI R16,178
+000120 bd06                      	OUT TCNT0, R16
                                  
-000116 9508                      	RET
+000121 9508                      	RET
                                  /*delayT2:
                                  	LDI R16,0b0000_0111
                                  	OUT TCCR2B, R16
@@ -1387,26 +1399,27 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  
                                  	RET*/
                                  ISR_TIMER:
-000117 930f                      	PUSH R16
-000118 b70f                      	IN R16,SREG
-000119 930f                      	PUSH R16
+000122 930f                      	PUSH R16
+000123 b70f                      	IN R16,SREG
+000124 930f                      	PUSH R16
                                  
                                  	//SBI PORTB,PB5
                                  
-00011a eb02                      	LDI R16,178
-00011b bd06                      	OUT TCNT0,R16
+000125 eb02                      	LDI R16,178
+000126 bd06                      	OUT TCNT0,R16
                                  
-00011c 9533                      	INC counter
-00011d 3b32                      	CPI counter, 178
-00011e f4a9                      	BRNE SALTO
-00011f 2733                      	CLR counter
+000127 9533                      	INC counter
+000128 9453                      	INC counter2
+000129 3b32                      	CPI counter, 178
+00012a f4a9                      	BRNE SALTO
+00012b 2733                      	CLR counter
                                  
-000120 9543                      	INC segundos
-000121 334c                      	CPI segundos,60
-000122 f011                      	BREQ empieza
+00012c 9543                      	INC segundos
+00012d 334c                      	CPI segundos,60
+00012e f011                      	BREQ empieza
                                  	/*SBRC flags,0
                                  	CALL set_hora*/
-000123 940c 0134                 	JMP SALTO
+00012f 940c 0140                 	JMP SALTO
                                  
                                  /*set_hora:
                                  	CLR count_unidades
@@ -1421,171 +1434,171 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  	SUB R16,R17
                                  	CPI R16,0b0000_0000
                                  	BREQ decenas_alarma*/
-000125 2744                      	CLR segundos
-000126 9553                      	INC count_unidades
-000127 e00f                      	LDI R16,0b0000_1111
-000128 2305                      	AND R16,count_unidades
-000129 300a                      	CPI R16, 0b0000_1010
-00012a f069                      	BREQ overflow
-00012b 940c 0134                 	JMP SALTO
+000131 2744                      	CLR segundos
+000132 9553                      	INC count_unidades
+000133 e00f                      	LDI R16,0b0000_1111
+000134 2305                      	AND R16,count_unidades
+000135 300a                      	CPI R16, 0b0000_1010
+000136 f069                      	BREQ overflow
+000137 940c 0140                 	JMP SALTO
                                  
                                  decenas_alarma:
-00012d 2f06                      	MOV R16,count_decenas
-00012e 2d1d                      	MOV R17, alarma_dec
-00012f 1b01                      	SUB R16,R17
-000130 3000                      	CPI R16,0b0000_0000
-000131 f009                      	BREQ sonar_alarma
-000132 c001                      	RJMP SALTO
+000139 2f06                      	MOV R16,count_decenas
+00013a 2d1d                      	MOV R17, alarma_dec
+00013b 1b01                      	SUB R16,R17
+00013c 3000                      	CPI R16,0b0000_0000
+00013d f009                      	BREQ sonar_alarma
+00013e c001                      	RJMP SALTO
                                  
                                  sonar_alarma:
-000133 9a2c                      	SBI PORTB,PB4
+00013f 9a2c                      	SBI PORTB,PB4
                                  
                                  SALTO:
-000134 910f                      	POP R16
-000135 bf0f                      	OUT SREG,R16
-000136 910f                      	POP R16
-000137 9518                      	RETI
+000140 910f                      	POP R16
+000141 bf0f                      	OUT SREG,R16
+000142 910f                      	POP R16
+000143 9518                      	RETI
                                  
                                  overflow:
-000138 ef00                      	LDI R16,0b1111_0000
-000139 2350                      	AND count_unidades,R16
-00013a 9563                      	INC count_decenas
-00013b e00f                      	LDI R16,0b0000_1111
-00013c 2306                      	AND R16,count_decenas
-00013d 3006                      	CPI R16, 0b0000_0110
-00013e f011                      	BREQ overflow_decenas
-00013f 940c 0134                 	JMP SALTO
+000144 ef00                      	LDI R16,0b1111_0000
+000145 2350                      	AND count_unidades,R16
+000146 9563                      	INC count_decenas
+000147 e00f                      	LDI R16,0b0000_1111
+000148 2306                      	AND R16,count_decenas
+000149 3006                      	CPI R16, 0b0000_0110
+00014a f011                      	BREQ overflow_decenas
+00014b 940c 0140                 	JMP SALTO
                                  
                                  overflow_decenas:
                                  	;trabajar con unidades de hora
-000141 ef00                      	LDI R16,0b1111_0000
-000142 2360                      	AND count_decenas,R16;pomner en 0 las unidades de minutos
-000143 e00f                      	LDI R16,0b0000_1111
-000144 9552                      	SWAP count_unidades
-000145 9553                      	INC count_unidades
-000146 2305                      	AND R16,count_unidades
-000147 9552                      	SWAP count_unidades
-000148 3004                      	CPI R16,0b0000_0100
-000149 f061                      	BREQ verificar_hora
-00014a 300a                      	CPI R16,0b0000_1010
-00014b f011                      	BREQ overflow_uhora
-00014c 940c 0134                 	JMP SALTO
+00014d ef00                      	LDI R16,0b1111_0000
+00014e 2360                      	AND count_decenas,R16;pomner en 0 las unidades de minutos
+00014f e00f                      	LDI R16,0b0000_1111
+000150 9552                      	SWAP count_unidades
+000151 9553                      	INC count_unidades
+000152 2305                      	AND R16,count_unidades
+000153 9552                      	SWAP count_unidades
+000154 3004                      	CPI R16,0b0000_0100
+000155 f061                      	BREQ verificar_hora
+000156 300a                      	CPI R16,0b0000_1010
+000157 f011                      	BREQ overflow_uhora
+000158 940c 0140                 	JMP SALTO
                                  
                                  overflow_uhora:
                                  	;trabajar con decenas de hora
-00014e e00f                      	LDI R16,0b0000_1111
-00014f 2350                      	AND count_unidades,R16
-000150 9562                      	SWAP count_decenas
-000151 9563                      	INC count_decenas
-000152 2306                      	AND R16,count_decenas
-000153 9562                      	SWAP count_decenas
-000154 940c 0134                 	JMP SALTO
+00015a e00f                      	LDI R16,0b0000_1111
+00015b 2350                      	AND count_unidades,R16
+00015c 9562                      	SWAP count_decenas
+00015d 9563                      	INC count_decenas
+00015e 2306                      	AND R16,count_decenas
+00015f 9562                      	SWAP count_decenas
+000160 940c 0140                 	JMP SALTO
                                  
                                  verificar_hora:
-000156 ef00                      	LDI R16,0b1111_0000
-000157 2306                      	AND R16,count_decenas
-000158 9502                      	SWAP R16
-000159 3002                      	CPI R16,0b0000_0010
-00015a f011                      	BREQ ultima_hora
-00015b 940c 0134                 	JMP SALTO
+000162 ef00                      	LDI R16,0b1111_0000
+000163 2306                      	AND R16,count_decenas
+000164 9502                      	SWAP R16
+000165 3002                      	CPI R16,0b0000_0010
+000166 f011                      	BREQ ultima_hora
+000167 940c 0140                 	JMP SALTO
                                  
                                  ultima_hora:
-00015d e050                      	LDI count_unidades,0b0000_0000
-00015e e060                      	LDI count_decenas,0b0000_0000
-00015f 9593                      	INC dia
-000160 2f09                      	MOV R16,dia
-000161 3209                      	CPI R16,0b0010_1001//verifica si dia es 29
-000162 f049                      	BREQ verificar_feb
-000163 3301                      	CPI R16,0b0011_0001//dia 31
-000164 f081                      	BREQ verificar_mes30
-000165 3302                      	CPI R16,0b0011_0010//dia32
-000166 f129                      	BREQ verificar_mes31
-000167 700f                      	ANDI R16,0b0000_1111
-000168 300a                      	CPI R16,0b0000_1010//dia 9 en mes normal
-000169 f1d9                      	BREQ overflow_dia
-00016a 940c 0134                 	JMP SALTO
+000169 e050                      	LDI count_unidades,0b0000_0000
+00016a e060                      	LDI count_decenas,0b0000_0000
+00016b 9593                      	INC dia
+00016c 2f09                      	MOV R16,dia
+00016d 3209                      	CPI R16,0b0010_1001//verifica si dia es 29
+00016e f049                      	BREQ verificar_feb
+00016f 3301                      	CPI R16,0b0011_0001//dia 31
+000170 f081                      	BREQ verificar_mes30
+000171 3302                      	CPI R16,0b0011_0010//dia32
+000172 f129                      	BREQ verificar_mes31
+000173 700f                      	ANDI R16,0b0000_1111
+000174 300a                      	CPI R16,0b0000_1010//dia 9 en mes normal
+000175 f1d9                      	BREQ overflow_dia
+000176 940c 0140                 	JMP SALTO
                                  
                                  verificar_feb:
-00016c 2f07                      	MOV R16,mes 
-00016d 3002                      	CPI R16,0b0000_0010//verificar si mes =0/2
-00016e f011                      	BREQ febrero
-00016f 940c 0134                 	JMP SALTO
+000178 2f07                      	MOV R16,mes 
+000179 3002                      	CPI R16,0b0000_0010//verificar si mes =0/2
+00017a f011                      	BREQ febrero
+00017b 940c 0140                 	JMP SALTO
                                  
                                  febrero:
-000171 9573                      	INC mes
-000172 e091                      	LDI dia,0b0000_0001
-000173 940c 0134                 	JMP SALTO
+00017d 9573                      	INC mes
+00017e e091                      	LDI dia,0b0000_0001
+00017f 940c 0140                 	JMP SALTO
                                  
                                  verificar_mes30:
-000175 2f07                      	MOV R16,mes
-000176 3004                      	CPI R16,0b0000_0100;verificar si mes es 0/4   
-000177 f081                      	BREQ mes_30
-000178 3006                      	CPI R16,0b0000_0110;0/6   
-000179 f071                      	BREQ mes_30
-00017a 3009                      	CPI R16,0b0000_1001; 0/9  
-00017b f021                      	BREQ septiembre
-00017c 3101                      	CPI R16, 0b0001_0001; 1/1
-00017d f051                      	BREQ mes_30
-00017e 940c 0134                 	JMP SALTO
+000181 2f07                      	MOV R16,mes
+000182 3004                      	CPI R16,0b0000_0100;verificar si mes es 0/4   
+000183 f081                      	BREQ mes_30
+000184 3006                      	CPI R16,0b0000_0110;0/6   
+000185 f071                      	BREQ mes_30
+000186 3009                      	CPI R16,0b0000_1001; 0/9  
+000187 f021                      	BREQ septiembre
+000188 3101                      	CPI R16, 0b0001_0001; 1/1
+000189 f051                      	BREQ mes_30
+00018a 940c 0140                 	JMP SALTO
                                  
                                  septiembre:
-000180 2f07                      	MOV R16,mes
-000181 9502                      	SWAP R16
-000182 9503                      	INC R16
-000183 9502                      	SWAP R16
-000184 2f70                      	MOV mes,R16
-000185 e091                      	LDI dia,0b0000_0001
-000186 940c 0134                 	JMP SALTO
+00018c 2f07                      	MOV R16,mes
+00018d 9502                      	SWAP R16
+00018e 9503                      	INC R16
+00018f 9502                      	SWAP R16
+000190 2f70                      	MOV mes,R16
+000191 e091                      	LDI dia,0b0000_0001
+000192 940c 0140                 	JMP SALTO
                                  
                                  mes_30:
-000188 9573                      	INC mes
-000189 e091                      	LDI dia,0b0000_0001
-00018a 940c 0134                 	JMP SALTO
+000194 9573                      	INC mes
+000195 e091                      	LDI dia,0b0000_0001
+000196 940c 0140                 	JMP SALTO
                                  
                                  verificar_mes31:
-00018c 2f07                      	MOV R16,mes
-00018d 3001                      	CPI R16,0b0000_0001;verificar si mes es 0/1  
-00018e f071                      	BREQ mes_31
-00018f 3003                      	CPI R16,0b0000_0011;0/3   
-000190 f061                      	BREQ mes_31
-000191 3005                      	CPI R16,0b0000_0101; 0/5 
-000192 f051                      	BREQ mes_31
-000193 3009                      	CPI R16, 0b0000_1001; 07
-000194 f041                      	BREQ mes_31
-000195 3008                      	CPI R16, 0b0000_1000; 08
-000196 f031                      	BREQ mes_31
-000197 3100                      	CPI R16, 0b0001_0000; 10
-000198 f021                      	BREQ mes_31
-000199 3102                      	CPI R16, 0b0001_0010; 12
-00019a f031                      	BREQ diciembre
-00019b 940c 0134                 	JMP SALTO
+000198 2f07                      	MOV R16,mes
+000199 3001                      	CPI R16,0b0000_0001;verificar si mes es 0/1  
+00019a f071                      	BREQ mes_31
+00019b 3003                      	CPI R16,0b0000_0011;0/3   
+00019c f061                      	BREQ mes_31
+00019d 3005                      	CPI R16,0b0000_0101; 0/5 
+00019e f051                      	BREQ mes_31
+00019f 3009                      	CPI R16, 0b0000_1001; 07
+0001a0 f041                      	BREQ mes_31
+0001a1 3008                      	CPI R16, 0b0000_1000; 08
+0001a2 f031                      	BREQ mes_31
+0001a3 3100                      	CPI R16, 0b0001_0000; 10
+0001a4 f021                      	BREQ mes_31
+0001a5 3102                      	CPI R16, 0b0001_0010; 12
+0001a6 f031                      	BREQ diciembre
+0001a7 940c 0140                 	JMP SALTO
                                  
                                  mes_31:
-00019d 9573                      	INC mes
-00019e e091                      	LDI dia,0b0000_0001
-00019f 940c 0134                 	JMP SALTO
+0001a9 9573                      	INC mes
+0001aa e091                      	LDI dia,0b0000_0001
+0001ab 940c 0140                 	JMP SALTO
                                  
                                  diciembre:
-0001a1 e071                      	LDI mes,0b0000_0001
-0001a2 e091                      	LDI dia,0b0000_0001
-0001a3 940c 0134                 	JMP SALTO
+0001ad e071                      	LDI mes,0b0000_0001
+0001ae e091                      	LDI dia,0b0000_0001
+0001af 940c 0140                 	JMP SALTO
                                  
                                  overflow_dia:
-0001a5 2f09                      	MOV R16,dia
-0001a6 7f00                      	ANDI R16,0b1111_0000
-0001a7 9502                      	SWAP R16
-0001a8 9503                      	INC R16
-0001a9 9502                      	SWAP R16
-0001aa 2f90                      	MOV dia,R16
-0001ab 940c 0134                 	JMP SALTO
+0001b1 2f09                      	MOV R16,dia
+0001b2 7f00                      	ANDI R16,0b1111_0000
+0001b3 9502                      	SWAP R16
+0001b4 9503                      	INC R16
+0001b5 9502                      	SWAP R16
+0001b6 2f90                      	MOV dia,R16
+0001b7 940c 0140                 	JMP SALTO
                                  
                                  
                                  delaybounce:
-0001ad ef0a                      	LDI r16,250//250 para notar el valor de muestreo en los display
+0001b9 ef0a                      	LDI r16,250//250 para notar el valor de muestreo en los display
                                  	delay:
-0001ae 950a                      		DEC r16
-0001af f7f1                      		BRNE delay
-0001b0 9508                      	RET
+0001ba 950a                      		DEC r16
+0001bb f7f1                      		BRNE delay
+0001bc 9508                      	RET
                                  
                                  //*******************************************************************
                                  //TIMER2
@@ -1620,608 +1633,608 @@ C:\Users\lefaj\Documents\Atmel Studio\7.0\proyecto_1\Proyecto_1\proyecto_1\main.
                                  //INTERRUPCIÓN DE BOTONES
                                  //*******************************************************************
                                  ISR_PCINT1:
-0001b1 930f                      	PUSH R16
-0001b2 b70f                      	IN R16,SREG
-0001b3 930f                      	PUSH R16
+0001bd 930f                      	PUSH R16
+0001be b70f                      	IN R16,SREG
+0001bf 930f                      	PUSH R16
                                  	
-0001b4 ff27                      	SBRS modo_btn,7
-0001b5 940c 01bb                 	JMP INT_1
-0001b7 940c 01c0                 	JMP INT_2
-0001b9 940c 03b7                 	JMP ISR_POP
+0001c0 ff27                      	SBRS modo_btn,7
+0001c1 940c 01c7                 	JMP INT_1
+0001c3 940c 01cc                 	JMP INT_2
+0001c5 940c 03c3                 	JMP ISR_POP
                                  	
                                  INT_1:
-0001bb e800                      	LDI R16, 0b1000_0000
-0001bc 2b20                      	OR modo_btn,R16
-0001bd b116                      	IN R17,PINC
-0001be 940c 03b7                 	JMP ISR_POP
+0001c7 e800                      	LDI R16, 0b1000_0000
+0001c8 2b20                      	OR modo_btn,R16
+0001c9 b116                      	IN R17,PINC
+0001ca 940c 03c3                 	JMP ISR_POP
                                  
                                  INT_2:
-0001c0 e70f                      	LDI R16,0b0111_1111
-0001c1 2320                      	AND modo_btn,R16
-0001c2 311e                      	CPI R17,0b00001_1110
-0001c3 f061                      	BREQ btn1
-0001c4 311d                      	CPI R17,0b0001_1101
-0001c5 f139                      	BREQ btn2
-0001c6 311b                      	CPI R17,0b00001_1011
-0001c7 f1e9                      	BREQ btn3
-0001c8 3117                      	CPI R17,0b0001_0111
-0001c9 f1c9                      	BREQ ir_a_btn4
-0001ca 301f                      	CPI R17,0b0000_1111
-0001cb f011                      	BREQ ir_a_btn5
-0001cc 940c 03b7                 	JMP ISR_POP
+0001cc e70f                      	LDI R16,0b0111_1111
+0001cd 2320                      	AND modo_btn,R16
+0001ce 311e                      	CPI R17,0b00001_1110
+0001cf f061                      	BREQ btn1
+0001d0 311d                      	CPI R17,0b0001_1101
+0001d1 f139                      	BREQ btn2
+0001d2 311b                      	CPI R17,0b00001_1011
+0001d3 f1e9                      	BREQ btn3
+0001d4 3117                      	CPI R17,0b0001_0111
+0001d5 f1c9                      	BREQ ir_a_btn4
+0001d6 301f                      	CPI R17,0b0000_1111
+0001d7 f011                      	BREQ ir_a_btn5
+0001d8 940c 03c3                 	JMP ISR_POP
                                  
                                  ir_a_btn5:
-0001ce 940c 03b4                 	JMP btn5
+0001da 940c 03c0                 	JMP btn5
                                  
                                  btn1:
-0001d0 9522                      	SWAP modo_btn
-0001d1 9523                      	INC modo_btn
-0001d2 e00f                      	LDI R16, 0b0000_1111
-0001d3 2302                      	AND R16,modo_btn
-0001d4 9522                      	SWAP modo_btn
-0001d5 3001                      	CPI R16,0b0000_0001
-0001d6 f051                      	BREQ set_horaconf_clear
-0001d7 3003                      	CPI R16,0b0000_0011
-0001d8 f061                      	BREQ set_fechaconf_clear
-0001d9 3004                      	CPI R16,0b0000_0100
-0001da f021                      	BREQ configurar_alarma_jmp
-0001db 3005                      	CPI R16,0b0000_0101 
-0001dc f061                      	BREQ overflow_modo
-0001dd 940c 03b7                 	JMP ISR_POP
+0001dc 9522                      	SWAP modo_btn
+0001dd 9523                      	INC modo_btn
+0001de e00f                      	LDI R16, 0b0000_1111
+0001df 2302                      	AND R16,modo_btn
+0001e0 9522                      	SWAP modo_btn
+0001e1 3001                      	CPI R16,0b0000_0001
+0001e2 f051                      	BREQ set_horaconf_clear
+0001e3 3003                      	CPI R16,0b0000_0011
+0001e4 f061                      	BREQ set_fechaconf_clear
+0001e5 3004                      	CPI R16,0b0000_0100
+0001e6 f021                      	BREQ configurar_alarma_jmp
+0001e7 3005                      	CPI R16,0b0000_0101 
+0001e8 f061                      	BREQ overflow_modo
+0001e9 940c 03c3                 	JMP ISR_POP
                                  
                                  configurar_alarma_jmp:
-0001df 940c 0236                 	JMP configurar_alarma
+0001eb 940c 0242                 	JMP configurar_alarma
                                  
                                  set_horaconf_clear:
-0001e1 24ee                      	CLR  uni_conf
-0001e2 24ff                      	CLR dec_conf
-0001e3 940c 03b7                 	JMP ISR_POP
+0001ed 24ee                      	CLR  uni_conf
+0001ee 24ff                      	CLR dec_conf
+0001ef 940c 03c3                 	JMP ISR_POP
                                  
                                  set_fechaconf_clear:
-0001e5 24aa                      	CLR mes_config
-0001e6 24bb                      	CLR dia_config
-0001e7 940c 03b7                 	JMP ISR_POP
+0001f1 24aa                      	CLR mes_config
+0001f2 24bb                      	CLR dia_config
+0001f3 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_modo:
-0001e9 e00f                      	LDI R16,0b0000_1111
-0001ea 2320                      	AND modo_btn,R16
-0001eb 940c 03b7                 	JMP ISR_POP
+0001f5 e00f                      	LDI R16,0b0000_1111
+0001f6 2320                      	AND modo_btn,R16
+0001f7 940c 03c3                 	JMP ISR_POP
                                  
                                  btn2:
-0001ed 2f02                      	MOV R16,modo_btn
-0001ee 9502                      	SWAP R16
-0001ef 700f                      	ANDI R16,0b0000_1111
-0001f0 3001                      	CPI R16, 0b0000_0001
-0001f1 f031                      	BREQ cambiar_display
-0001f2 3003                      	CPI r16,0b0000_0011
-0001f3 f021                      	BREQ cambiar_display
-0001f4 3004                      	CPI R16,0b0000_0100
-0001f5 f011                      	BREQ cambiar_display
-0001f6 940c 03b7                 	JMP ISR_POP
-                                 cambiar_display:
-0001f8 9523                      	INC modo_btn
 0001f9 2f02                      	MOV R16,modo_btn
-0001fa 700f                      	ANDI R16,0b0000_1111
-0001fb 3004                      	CPI R16,0b0000_0100
-0001fc f011                      	BREQ overflow_displays
-0001fd 940c 03b7                 	JMP ISR_POP
+0001fa 9502                      	SWAP R16
+0001fb 700f                      	ANDI R16,0b0000_1111
+0001fc 3001                      	CPI R16, 0b0000_0001
+0001fd f031                      	BREQ cambiar_display
+0001fe 3003                      	CPI r16,0b0000_0011
+0001ff f021                      	BREQ cambiar_display
+000200 3004                      	CPI R16,0b0000_0100
+000201 f011                      	BREQ cambiar_display
+000202 940c 03c3                 	JMP ISR_POP
+                                 cambiar_display:
+000204 9523                      	INC modo_btn
+000205 2f02                      	MOV R16,modo_btn
+000206 700f                      	ANDI R16,0b0000_1111
+000207 3004                      	CPI R16,0b0000_0100
+000208 f011                      	BREQ overflow_displays
+000209 940c 03c3                 	JMP ISR_POP
                                  overflow_displays:
-0001ff ef00                      	LDI R16,0b1111_0000
-000200 2320                      	AND modo_btn,R16
-000201 940c 03b7                 	JMP ISR_POP
+00020b ef00                      	LDI R16,0b1111_0000
+00020c 2320                      	AND modo_btn,R16
+00020d 940c 03c3                 	JMP ISR_POP
                                  ir_a_btn4:
-000203 940c 030a                 	JMP btn4
+00020f 940c 0316                 	JMP btn4
                                  btn3:
-000205 2f02                      	MOV R16, modo_btn
-000206 9502                      	SWAP R16
-000207 700f                      	ANDI R16,0b0000_1111
-000208 3001                      	CPI R16,0b0000_0001
-000209 f031                      	BREQ configurar_hora
-00020a 3003                      	CPI R16,0b0000_0011
-00020b f0b1                      	BREQ configurar_fecha
-00020c 3004                      	CPI R16,0b0000_0100
-00020d f141                      	BREQ configurar_alarma
-00020e 940c 03b7                 	JMP ISR_POP
+000211 2f02                      	MOV R16, modo_btn
+000212 9502                      	SWAP R16
+000213 700f                      	ANDI R16,0b0000_1111
+000214 3001                      	CPI R16,0b0000_0001
+000215 f031                      	BREQ configurar_hora
+000216 3003                      	CPI R16,0b0000_0011
+000217 f0b1                      	BREQ configurar_fecha
+000218 3004                      	CPI R16,0b0000_0100
+000219 f141                      	BREQ configurar_alarma
+00021a 940c 03c3                 	JMP ISR_POP
                                  
                                  configurar_hora:
-000210 e01f                      	LDI R17, 0b0000_1111
-000211 2312                      	AND R17,modo_btn
-000212 3010                      	CPI R17,0
-000213 f1c1                      	BREQ cambiar_disp1
-000214 3011                      	CPI R17,1
-000215 f031                      	BREQ cambiar_disp2_jmp
-000216 3012                      	CPI R17,2
-000217 f031                      	BREQ cambiar_disp3_jmp
-000218 3013                      	CPI R17,3
-000219 f031                      	BREQ cambiar_disp4_jmp
-00021a 940c 03b7                 	JMP ISR_POP
+00021c e01f                      	LDI R17, 0b0000_1111
+00021d 2312                      	AND R17,modo_btn
+00021e 3010                      	CPI R17,0
+00021f f1c1                      	BREQ cambiar_disp1
+000220 3011                      	CPI R17,1
+000221 f031                      	BREQ cambiar_disp2_jmp
+000222 3012                      	CPI R17,2
+000223 f031                      	BREQ cambiar_disp3_jmp
+000224 3013                      	CPI R17,3
+000225 f031                      	BREQ cambiar_disp4_jmp
+000226 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp2_jmp:
-00021c 940c 025b                 	JMP cambiar_disp2
+000228 940c 0267                 	JMP cambiar_disp2
                                  cambiar_disp3_jmp:
-00021e 940c 026a                 	JMP cambiar_disp3
+00022a 940c 0276                 	JMP cambiar_disp3
                                  cambiar_disp4_jmp:
-000220 940c 0284                 	JMP cambiar_disp4
+00022c 940c 0290                 	JMP cambiar_disp4
                                  
                                  
                                  configurar_fecha:
-000222 e01f                      	LDI R17, 0b0000_1111
-000223 2312                      	AND R17,modo_btn
-000224 3010                      	CPI R17,0
-000225 f041                      	BREQ cambiar_disp1_fjmp
-000226 3011                      	CPI R17,1
-000227 f041                      	BREQ cambiar_disp2_fjmp
-000228 3012                      	CPI R17,2
-000229 f041                      	BREQ cambiar_disp3_fjmp
-00022a 3013                      	CPI R17,3
-00022b f041                      	BREQ cambiar_disp4_fjmp
-00022c 940c 03b7                 	JMP ISR_POP
+00022e e01f                      	LDI R17, 0b0000_1111
+00022f 2312                      	AND R17,modo_btn
+000230 3010                      	CPI R17,0
+000231 f041                      	BREQ cambiar_disp1_fjmp
+000232 3011                      	CPI R17,1
+000233 f041                      	BREQ cambiar_disp2_fjmp
+000234 3012                      	CPI R17,2
+000235 f041                      	BREQ cambiar_disp3_fjmp
+000236 3013                      	CPI R17,3
+000237 f041                      	BREQ cambiar_disp4_fjmp
+000238 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp1_fjmp:
-00022e 940c 02a0                 	JMP cambiar_disp1_f
+00023a 940c 02ac                 	JMP cambiar_disp1_f
                                  cambiar_disp2_fjmp:
-000230 940c 02ae                 	JMP cambiar_disp2_f
+00023c 940c 02ba                 	JMP cambiar_disp2_f
                                  cambiar_disp3_fjmp:
-000232 940c 02e7                 	JMP cambiar_disp3_f
+00023e 940c 02f3                 	JMP cambiar_disp3_f
                                  cambiar_disp4_fjmp:
-000234 940c 02fc                 	JMP cambiar_disp4_f
+000240 940c 0308                 	JMP cambiar_disp4_f
                                  
                                  configurar_alarma:
-000236 e01f                      	LDI R17, 0b0000_1111
-000237 2312                      	AND R17,modo_btn
-000238 3010                      	CPI R17,0
-000239 f051                      	BREQ cambiar_disp1_ajmp
-00023a 3011                      	CPI R17,1
-00023b f051                      	BREQ cambiar_disp2_ajmp
-00023c 3012                      	CPI R17,2
-00023d f051                      	BREQ cambiar_disp3_ajmp
-00023e 3013                      	CPI R17,3
-00023f f051                      	BREQ cambiar_disp4_ajmp
-000240 940c 03b7                 	JMP ISR_POP
-000242 940c 03b7                 	JMP ISR_POP
+000242 e01f                      	LDI R17, 0b0000_1111
+000243 2312                      	AND R17,modo_btn
+000244 3010                      	CPI R17,0
+000245 f051                      	BREQ cambiar_disp1_ajmp
+000246 3011                      	CPI R17,1
+000247 f051                      	BREQ cambiar_disp2_ajmp
+000248 3012                      	CPI R17,2
+000249 f051                      	BREQ cambiar_disp3_ajmp
+00024a 3013                      	CPI R17,3
+00024b f051                      	BREQ cambiar_disp4_ajmp
+00024c 940c 03c3                 	JMP ISR_POP
+00024e 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp1_ajmp:
-000244 940c 0376                 	JMP cambiar_disp1_a
+000250 940c 0382                 	JMP cambiar_disp1_a
                                  cambiar_disp2_ajmp:
-000246 940c 0382                 	JMP cambiar_disp2_a
+000252 940c 038e                 	JMP cambiar_disp2_a
                                  cambiar_disp3_ajmp:
-000248 940c 038e                 	JMP cambiar_disp3_a
+000254 940c 039a                 	JMP cambiar_disp3_a
                                  cambiar_disp4_ajmp:
-00024a 940c 03a7                 	JMP cambiar_disp4_a
+000256 940c 03b3                 	JMP cambiar_disp4_a
                                  
                                  //CONFIGURACION SUMAR HORA
                                  
                                  cambiar_disp1:
                                  	;CLR segundos
-00024c 94e3                      	INC uni_conf
-00024d 2d1e                      	MOV R17,uni_conf
-00024e 701f                      	ANDI R17,0b0000_1111
-00024f 301a                      	CPI R17,0b0000_1010
-000250 f029                      	BREQ overflow_disp1
-000251 2d5e                      	MOV count_unidades,uni_conf
-000252 2d6f                      	MOV count_decenas,dec_conf
-000253 2744                      	CLR segundos
-000254 940c 03b7                 	JMP ISR_POP
+000258 94e3                      	INC uni_conf
+000259 2d1e                      	MOV R17,uni_conf
+00025a 701f                      	ANDI R17,0b0000_1111
+00025b 301a                      	CPI R17,0b0000_1010
+00025c f029                      	BREQ overflow_disp1
+00025d 2d5e                      	MOV count_unidades,uni_conf
+00025e 2d6f                      	MOV count_decenas,dec_conf
+00025f 2744                      	CLR segundos
+000260 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp1:
-000256 ef00                      	LDI R16,0b1111_0000
-000257 210e                      	AND R16,uni_conf
-000258 2ee0                      	MOV uni_conf, R16
-000259 940c 03b7                 	JMP ISR_POP
+000262 ef00                      	LDI R16,0b1111_0000
+000263 210e                      	AND R16,uni_conf
+000264 2ee0                      	MOV uni_conf, R16
+000265 940c 03c3                 	JMP ISR_POP
                                  
                                  
                                  cambiar_disp2:
-00025b 94f3                      	INC dec_conf
-00025c 2d1f                      	MOV R17,dec_conf
-00025d 701f                      	ANDI R17,0b0000_1111
-00025e 3016                      	CPI R17,0b0000_0110
-00025f f029                      	BREQ overflow_disp2
-000260 2d5e                      	MOV count_unidades,uni_conf
-000261 2d6f                      	MOV count_decenas,dec_conf
-000262 2744                      	CLR segundos
-000263 940c 03b7                 	JMP ISR_POP
+000267 94f3                      	INC dec_conf
+000268 2d1f                      	MOV R17,dec_conf
+000269 701f                      	ANDI R17,0b0000_1111
+00026a 3016                      	CPI R17,0b0000_0110
+00026b f029                      	BREQ overflow_disp2
+00026c 2d5e                      	MOV count_unidades,uni_conf
+00026d 2d6f                      	MOV count_decenas,dec_conf
+00026e 2744                      	CLR segundos
+00026f 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp2:
-000265 ef00                      	LDI R16,0b1111_0000
-000266 210f                      	AND R16,dec_conf
-000267 2ef0                      	MOV dec_conf,R16
-000268 940c 03b7                 	JMP ISR_POP
+000271 ef00                      	LDI R16,0b1111_0000
+000272 210f                      	AND R16,dec_conf
+000273 2ef0                      	MOV dec_conf,R16
+000274 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp3:
-00026a 94e2                      	SWAP uni_conf
-00026b 94e3                      	INC uni_conf
-00026c 2d1e                      	MOV R17,uni_conf
-00026d 94e2                      	SWAP uni_conf
-00026e 701f                      	ANDI R17,0b0000_1111
-00026f 3014                      	CPI R17,0b0000_0100
-000270 f039                      	BREQ ver_horaconf
-000271 301a                      	CPI R17,0b0000_1010
-000272 f061                      	BREQ overflow_disp3
-000273 2d5e                      	MOV count_unidades,uni_conf
-000274 2d6f                      	MOV count_decenas,dec_conf
-000275 2744                      	CLR segundos
-000276 940c 03b7                 	JMP ISR_POP
+000276 94e2                      	SWAP uni_conf
+000277 94e3                      	INC uni_conf
+000278 2d1e                      	MOV R17,uni_conf
+000279 94e2                      	SWAP uni_conf
+00027a 701f                      	ANDI R17,0b0000_1111
+00027b 3014                      	CPI R17,0b0000_0100
+00027c f039                      	BREQ ver_horaconf
+00027d 301a                      	CPI R17,0b0000_1010
+00027e f061                      	BREQ overflow_disp3
+00027f 2d5e                      	MOV count_unidades,uni_conf
+000280 2d6f                      	MOV count_decenas,dec_conf
+000281 2744                      	CLR segundos
+000282 940c 03c3                 	JMP ISR_POP
                                  
                                  ver_horaconf:
-000278 ef10                      	LDI R17,0b1111_0000
-000279 211f                      	AND R17,dec_conf
-00027a 9512                      	SWAP R17
-00027b 3012                      	CPI R17,0b0000_0010
-00027c f0b9                      	BREQ overflow_disp4_a
-00027d 940c 03b7                 	JMP ISR_POP
+000284 ef10                      	LDI R17,0b1111_0000
+000285 211f                      	AND R17,dec_conf
+000286 9512                      	SWAP R17
+000287 3012                      	CPI R17,0b0000_0010
+000288 f0b9                      	BREQ overflow_disp4_a
+000289 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp3:
-00027f e00f                      	LDI R16,0b0000_1111
-000280 210e                      	AND R16,uni_conf
-000281 2ee0                      	MOV uni_conf,R16
-000282 940c 03b7                 	JMP ISR_POP
+00028b e00f                      	LDI R16,0b0000_1111
+00028c 210e                      	AND R16,uni_conf
+00028d 2ee0                      	MOV uni_conf,R16
+00028e 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp4:
-000284 ef00                      	LDI R16,0b1111_0000
-000285 210e                      	AND R16,uni_conf
-000286 94f2                      	SWAP dec_conf
-000287 94f3                      	INC dec_conf
-000288 2d1f                      	MOV R17,dec_conf
-000289 94f2                      	SWAP dec_conf
-00028a 701f                      	ANDI R17,0b0000_1111
-00028b 3012                      	CPI R17,0b0000_0010
-00028c f059                      	BREQ desfase_hora
-00028d 3013                      	CPI R17,0b0000_0011
-00028e f029                      	BREQ overflow_disp4_a
-00028f 2d5e                      	MOV count_unidades,uni_conf
-000290 2d6f                      	MOV count_decenas,dec_conf
-000291 2744                      	CLR segundos
-000292 940c 03b7                 	JMP ISR_POP
+000290 ef00                      	LDI R16,0b1111_0000
+000291 210e                      	AND R16,uni_conf
+000292 94f2                      	SWAP dec_conf
+000293 94f3                      	INC dec_conf
+000294 2d1f                      	MOV R17,dec_conf
+000295 94f2                      	SWAP dec_conf
+000296 701f                      	ANDI R17,0b0000_1111
+000297 3012                      	CPI R17,0b0000_0010
+000298 f059                      	BREQ desfase_hora
+000299 3013                      	CPI R17,0b0000_0011
+00029a f029                      	BREQ overflow_disp4_a
+00029b 2d5e                      	MOV count_unidades,uni_conf
+00029c 2d6f                      	MOV count_decenas,dec_conf
+00029d 2744                      	CLR segundos
+00029e 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp4_a:
-000294 24ff                      	CLR dec_conf
-000295 24ee                      	CLR uni_conf
-000296 940c 03b7                 	JMP ISR_POP
+0002a0 24ff                      	CLR dec_conf
+0002a1 24ee                      	CLR uni_conf
+0002a2 940c 03c3                 	JMP ISR_POP
                                  
                                  desfase_hora:
-000298 3003                      	CPI R16,0b0000_0011
-000299 f40c                      	BRGE overflow_uni_dec
-00029a c11c                      	RJMP ISR_POP
+0002a4 3003                      	CPI R16,0b0000_0011
+0002a5 f40c                      	BRGE overflow_uni_dec
+0002a6 c11c                      	RJMP ISR_POP
                                  
                                  overflow_uni_dec:
-00029b 2d1e                      	MOV R17,uni_conf
-00029c 701f                      	ANDI R17,0b0000_1111
-00029d 6310                      	ORI R17,0b0011_0000
-00029e 2ee1                      	MOV uni_conf,R17
-00029f c117                      	RJMP ISR_POP
+0002a7 2d1e                      	MOV R17,uni_conf
+0002a8 701f                      	ANDI R17,0b0000_1111
+0002a9 6310                      	ORI R17,0b0011_0000
+0002aa 2ee1                      	MOV uni_conf,R17
+0002ab c117                      	RJMP ISR_POP
                                  
                                  
                                  //CONFIGURACION PARA SUMAR FECHA
                                  cambiar_disp1_f:
-0002a0 94b3                      	INC dia_config
-0002a1 2d0b                      	MOV R16, dia_config
-0002a2 700f                      	ANDI R16,0b0000_1111
-0002a3 300a                      	CPI R16,0b0000_1010
-0002a4 f021                      	BREQ overflow_disp1_f
-0002a5 2d9b                      	MOV dia,dia_config
-0002a6 2d7a                      	MOV mes,mes_config
-0002a7 940c 03b7                 	JMP ISR_POP
+0002ac 94b3                      	INC dia_config
+0002ad 2d0b                      	MOV R16, dia_config
+0002ae 700f                      	ANDI R16,0b0000_1111
+0002af 300a                      	CPI R16,0b0000_1010
+0002b0 f021                      	BREQ overflow_disp1_f
+0002b1 2d9b                      	MOV dia,dia_config
+0002b2 2d7a                      	MOV mes,mes_config
+0002b3 940c 03c3                 	JMP ISR_POP
                                  overflow_disp1_f:
-0002a9 2d0b                      	MOV R16,dia_config
-0002aa 7f00                      	ANDI R16,0b1111_0000
-0002ab 2eb0                      	MOV dia_config,R16
-0002ac 940c 03b7                 	JMP ISR_POP
+0002b5 2d0b                      	MOV R16,dia_config
+0002b6 7f00                      	ANDI R16,0b1111_0000
+0002b7 2eb0                      	MOV dia_config,R16
+0002b8 940c 03c3                 	JMP ISR_POP
                                  cambiar_disp2_f:
-0002ae 94b2                      	SWAP dia_config
-0002af 94b3                      	INC dia_config
-0002b0 2d0b                      	MOV R16,dia_config
-0002b1 94b2                      	SWAP dia_config
-0002b2 700f                      	ANDI R16,0b0000_1111
-0002b3 3002                      	CPI R16,0b0000_0010
-0002b4 f121                      	BREQ verificar_udia
-0002b5 3003                      	CPI R16,0b0000_0011
-0002b6 f031                      	BREQ no_mas_de_31d
-0002b7 3004                      	CPI R16,0b0000_0100
-0002b8 f0e1                      	BREQ overflow_disp2_f
-0002b9 2d9b                      	MOV dia,dia_config
-0002ba 2d7a                      	MOV mes,mes_config
-0002bb 940c 03b7                 	JMP ISR_POP
+0002ba 94b2                      	SWAP dia_config
+0002bb 94b3                      	INC dia_config
+0002bc 2d0b                      	MOV R16,dia_config
+0002bd 94b2                      	SWAP dia_config
+0002be 700f                      	ANDI R16,0b0000_1111
+0002bf 3002                      	CPI R16,0b0000_0010
+0002c0 f121                      	BREQ verificar_udia
+0002c1 3003                      	CPI R16,0b0000_0011
+0002c2 f031                      	BREQ no_mas_de_31d
+0002c3 3004                      	CPI R16,0b0000_0100
+0002c4 f0e1                      	BREQ overflow_disp2_f
+0002c5 2d9b                      	MOV dia,dia_config
+0002c6 2d7a                      	MOV mes,mes_config
+0002c7 940c 03c3                 	JMP ISR_POP
                                  no_mas_de_31d:
-0002bd 2d1a                      	MOV R17,mes_config
-0002be 3014                      	CPI R17,0b0000_0100
-0002bf f081                      	BREQ mes_30_dias
-0002c0 3016                      	CPI R17,0b0000_0110
-0002c1 f071                      	BREQ mes_30_dias
-0002c2 3019                      	CPI R17,0b0000_1001
-0002c3 f061                      	BREQ mes_30_dias
-0002c4 3111                      	CPI R17,0b0001_0001
-0002c5 f051                      	BREQ mes_30_dias
-0002c6 2d0b                      	MOV R16,dia_config
-0002c7 3302                      	CPI R16,0b0011_0010
-0002c8 f414                      	BRGE mes_31_dias
-0002c9 940c 03b7                 	JMP ISR_POP
+0002c9 2d1a                      	MOV R17,mes_config
+0002ca 3014                      	CPI R17,0b0000_0100
+0002cb f081                      	BREQ mes_30_dias
+0002cc 3016                      	CPI R17,0b0000_0110
+0002cd f071                      	BREQ mes_30_dias
+0002ce 3019                      	CPI R17,0b0000_1001
+0002cf f061                      	BREQ mes_30_dias
+0002d0 3111                      	CPI R17,0b0001_0001
+0002d1 f051                      	BREQ mes_30_dias
+0002d2 2d0b                      	MOV R16,dia_config
+0002d3 3302                      	CPI R16,0b0011_0010
+0002d4 f414                      	BRGE mes_31_dias
+0002d5 940c 03c3                 	JMP ISR_POP
                                  mes_31_dias:
-0002cb 2d0b                      	MOV R16,dia_config
-0002cc 7f00                      	ANDI R16,0b1111_0000
-0002cd 2eb0                      	MOV dia_config,R16
-0002ce 940c 03b7                 	JMP ISR_POP
+0002d7 2d0b                      	MOV R16,dia_config
+0002d8 7f00                      	ANDI R16,0b1111_0000
+0002d9 2eb0                      	MOV dia_config,R16
+0002da 940c 03c3                 	JMP ISR_POP
                                  mes_30_dias:
-0002d0 2d0b                      	MOV R16,dia_config
-0002d1 7f00                      	ANDI R16,0b1111_0000
-0002d2 2eb0                      	MOV dia_config,R16
-0002d3 940c 03b7                 	JMP ISR_POP
+0002dc 2d0b                      	MOV R16,dia_config
+0002dd 7f00                      	ANDI R16,0b1111_0000
+0002de 2eb0                      	MOV dia_config,R16
+0002df 940c 03c3                 	JMP ISR_POP
                                  overflow_disp2_f:
-0002d5 2d0b                      	MOV R16,dia_config
-0002d6 700f                      	ANDI R16,0b0000_1111
-0002d7 2eb0                      	MOV dia_config,R16
-0002d8 c0de                      	RJMP ISR_POP
+0002e1 2d0b                      	MOV R16,dia_config
+0002e2 700f                      	ANDI R16,0b0000_1111
+0002e3 2eb0                      	MOV dia_config,R16
+0002e4 c0de                      	RJMP ISR_POP
                                  verificar_udia:
-0002d9 2d0a                      	MOV R16,mes_config
-0002da 3002                      	CPI R16,0b0000_0010
-0002db f011                      	BREQ febrero_28d
-0002dc 940c 03b7                 	JMP ISR_POP
+0002e5 2d0a                      	MOV R16,mes_config
+0002e6 3002                      	CPI R16,0b0000_0010
+0002e7 f011                      	BREQ febrero_28d
+0002e8 940c 03c3                 	JMP ISR_POP
                                  febrero_28d:
-0002de 2d1b                      	MOV R17,dia_config
-0002df 701f                      	ANDI R17,0b0000_1111
-0002e0 3019                      	CPI R17,0b0000_1001
-0002e1 f009                      	BREQ febrero_invalido
-0002e2 c0d4                      	RJMP ISR_POP
+0002ea 2d1b                      	MOV R17,dia_config
+0002eb 701f                      	ANDI R17,0b0000_1111
+0002ec 3019                      	CPI R17,0b0000_1001
+0002ed f009                      	BREQ febrero_invalido
+0002ee c0d4                      	RJMP ISR_POP
                                  febrero_invalido:
-0002e3 2d0b                      	MOV R16,dia_config
-0002e4 7f00                      	ANDI R16,0b1111_0000
-0002e5 2eb0                      	MOV dia_config,R16
-0002e6 c0d0                      	RJMP ISR_POP
+0002ef 2d0b                      	MOV R16,dia_config
+0002f0 7f00                      	ANDI R16,0b1111_0000
+0002f1 2eb0                      	MOV dia_config,R16
+0002f2 c0d0                      	RJMP ISR_POP
                                  cambiar_disp3_f:
-0002e7 94a3                      	INC mes_config
-0002e8 2d1a                      	MOV R17,mes_config
-0002e9 701f                      	ANDI R17,0b0000_1111
-0002ea 301a                      	CPI R17,0b0000_1010
-0002eb f069                      	BREQ overflow_disp3_f
-0002ec 3013                      	CPI R17,0b0000_0011
-0002ed f021                      	BREQ overflow_mes_hasta_12
-0002ee 2d9b                      	MOV dia,dia_config
-0002ef 2d7a                      	MOV mes,mes_config
-0002f0 940c 03b7                 	JMP ISR_POP
+0002f3 94a3                      	INC mes_config
+0002f4 2d1a                      	MOV R17,mes_config
+0002f5 701f                      	ANDI R17,0b0000_1111
+0002f6 301a                      	CPI R17,0b0000_1010
+0002f7 f069                      	BREQ overflow_disp3_f
+0002f8 3013                      	CPI R17,0b0000_0011
+0002f9 f021                      	BREQ overflow_mes_hasta_12
+0002fa 2d9b                      	MOV dia,dia_config
+0002fb 2d7a                      	MOV mes,mes_config
+0002fc 940c 03c3                 	JMP ISR_POP
                                  overflow_mes_hasta_12:
-0002f2 2d0a                      	MOV R16,mes_config
-0002f3 7f00                      	ANDI R16,0b1111_0000
-0002f4 9502                      	SWAP R16
-0002f5 ff00                      	SBRS R16,0
-0002f6 c0c0                      	RJMP ISR_POP
-0002f7 940c 02f9                 	JMP overflow_disp3_f
+0002fe 2d0a                      	MOV R16,mes_config
+0002ff 7f00                      	ANDI R16,0b1111_0000
+000300 9502                      	SWAP R16
+000301 ff00                      	SBRS R16,0
+000302 c0c0                      	RJMP ISR_POP
+000303 940c 0305                 	JMP overflow_disp3_f
                                  
                                  overflow_disp3_f:
-0002f9 7f10                      	ANDI R17,0b1111_0000
-0002fa 940c 03b7                 	JMP ISR_POP
+000305 7f10                      	ANDI R17,0b1111_0000
+000306 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp4_f:
-0002fc fea4                      	SBRS mes_config,4
-0002fd 940c 0306                 	JMP poner1_decmes
-0002ff 2d0a                      	MOV R16,mes_config
-000300 700f                      	ANDI R16,0b0000_1111
-000301 2ea0                      	MOV mes_config,R16
-000302 2d9b                      	MOV dia,dia_config
-000303 2d7a                      	MOV mes,mes_config
-000304 940c 03b7                 	JMP ISR_POP
+000308 fea4                      	SBRS mes_config,4
+000309 940c 0312                 	JMP poner1_decmes
+00030b 2d0a                      	MOV R16,mes_config
+00030c 700f                      	ANDI R16,0b0000_1111
+00030d 2ea0                      	MOV mes_config,R16
+00030e 2d9b                      	MOV dia,dia_config
+00030f 2d7a                      	MOV mes,mes_config
+000310 940c 03c3                 	JMP ISR_POP
                                  poner1_decmes:
-000306 94a2                      	SWAP mes_config
-000307 94a3                      	INC mes_config
-000308 94a2                      	SWAP mes_config
-000309 c0ad                      	RJMP ISR_POP
+000312 94a2                      	SWAP mes_config
+000313 94a3                      	INC mes_config
+000314 94a2                      	SWAP mes_config
+000315 c0ad                      	RJMP ISR_POP
                                  
                                  //RESTA DISPLAYS HORA
                                  btn4:
-00030a 2f02                      	MOV R16, modo_btn
-00030b 9502                      	SWAP R16
-00030c 700f                      	ANDI R16,0b0000_1111
-00030d 3001                      	CPI R16,0b0000_0001
-00030e f011                      	BREQ configurar_hora_resta
+000316 2f02                      	MOV R16, modo_btn
+000317 9502                      	SWAP R16
+000318 700f                      	ANDI R16,0b0000_1111
+000319 3001                      	CPI R16,0b0000_0001
+00031a f011                      	BREQ configurar_hora_resta
                                  	;CPI R16,0b0000_0011
                                  	;BREQ configurar_fecha
-00030f 940c 03b7                 	JMP ISR_POP
+00031b 940c 03c3                 	JMP ISR_POP
                                  
                                  configurar_hora_resta:
-000311 e01f                      	LDI R17, 0b0000_1111
-000312 2312                      	AND R17,modo_btn
-000313 3011                      	CPI R17,1
-000314 f051                      	BREQ restar_disp1
-000315 3012                      	CPI R17,2
-000316 f0c9                      	BREQ restar_disp2
-000317 3013                      	CPI R17,3
-000318 f141                      	BREQ restar_disp3
-000319 3014                      	CPI R17,4
-00031a f011                      	BREQ restar_disp4_jmp
-00031b 940c 03b7                 	JMP ISR_POP
+00031d e01f                      	LDI R17, 0b0000_1111
+00031e 2312                      	AND R17,modo_btn
+00031f 3011                      	CPI R17,1
+000320 f051                      	BREQ restar_disp1
+000321 3012                      	CPI R17,2
+000322 f0c9                      	BREQ restar_disp2
+000323 3013                      	CPI R17,3
+000324 f141                      	BREQ restar_disp3
+000325 3014                      	CPI R17,4
+000326 f011                      	BREQ restar_disp4_jmp
+000327 940c 03c3                 	JMP ISR_POP
                                  
                                  restar_disp4_jmp:
-00031d 940c 0361                 	JMP restar_disp4
+000329 940c 036d                 	JMP restar_disp4
                                  
                                  restar_disp1:
-00031f 2d1e                      	MOV R17,uni_conf
-000320 701f                      	ANDI R17,0b0000_1111
-000321 951a                      	DEC R17
-000322 3f1f                      	CPI R17,0xFF
-000323 f031                      	BREQ underflow_disp1
-000324 94ea                      	DEC uni_conf
-000325 2d5e                      	MOV count_unidades,uni_conf
-000326 2d6f                      	MOV count_decenas,dec_conf
-000327 2744                      	CLR segundos
-000328 940c 03b7                 	JMP ISR_POP
+00032b 2d1e                      	MOV R17,uni_conf
+00032c 701f                      	ANDI R17,0b0000_1111
+00032d 951a                      	DEC R17
+00032e 3f1f                      	CPI R17,0xFF
+00032f f031                      	BREQ underflow_disp1
+000330 94ea                      	DEC uni_conf
+000331 2d5e                      	MOV count_unidades,uni_conf
+000332 2d6f                      	MOV count_decenas,dec_conf
+000333 2744                      	CLR segundos
+000334 940c 03c3                 	JMP ISR_POP
                                  
                                  underflow_disp1:
-00032a ef00                      	LDI R16,0b1111_0000
-00032b 210e                      	AND R16,uni_conf
-00032c 6009                      	ORI R16,0b0000_1001
-00032d 2ee0                      	MOV uni_conf, R16
-00032e 940c 03b7                 	JMP ISR_POP
+000336 ef00                      	LDI R16,0b1111_0000
+000337 210e                      	AND R16,uni_conf
+000338 6009                      	ORI R16,0b0000_1001
+000339 2ee0                      	MOV uni_conf, R16
+00033a 940c 03c3                 	JMP ISR_POP
                                  
                                  restar_disp2:
-000330 2d1f                      	MOV R17,dec_conf
-000331 701f                      	ANDI R17,0b0000_1111
-000332 951a                      	DEC R17
-000333 3f1f                      	CPI R17,0xFF
-000334 f031                      	BREQ underflow_disp2
-000335 94fa                      	DEC dec_conf
-000336 2d5e                      	MOV count_unidades,uni_conf
-000337 2d6f                      	MOV count_decenas,dec_conf
-000338 2744                      	CLR segundos
-000339 940c 03b7                 	JMP ISR_POP
+00033c 2d1f                      	MOV R17,dec_conf
+00033d 701f                      	ANDI R17,0b0000_1111
+00033e 951a                      	DEC R17
+00033f 3f1f                      	CPI R17,0xFF
+000340 f031                      	BREQ underflow_disp2
+000341 94fa                      	DEC dec_conf
+000342 2d5e                      	MOV count_unidades,uni_conf
+000343 2d6f                      	MOV count_decenas,dec_conf
+000344 2744                      	CLR segundos
+000345 940c 03c3                 	JMP ISR_POP
                                  
                                  underflow_disp2:
-00033b ef00                      	LDI R16,0b1111_0000
-00033c 210f                      	AND R16,dec_conf
-00033d 6005                      	ORI R16,0b0000_0101
-00033e 2ef0                      	MOV dec_conf,R16
-00033f 940c 03b7                 	JMP ISR_POP
+000347 ef00                      	LDI R16,0b1111_0000
+000348 210f                      	AND R16,dec_conf
+000349 6005                      	ORI R16,0b0000_0101
+00034a 2ef0                      	MOV dec_conf,R16
+00034b 940c 03c3                 	JMP ISR_POP
                                  
                                  restar_disp3:
-000341 94e2                      	SWAP uni_conf
-000342 2d1e                      	MOV R17,uni_conf
-000343 94e2                      	SWAP uni_conf
-000344 701f                      	ANDI R17,0b0000_1111
-000345 951a                      	DEC R17
-000346 3f1f                      	CPI R17,0xFF
-000347 f041                      	BREQ underflow_disp3
-000348 94e2                      	SWAP uni_conf
-000349 94ea                      	DEC uni_conf
-00034a 94e2                      	SWAP uni_conf
-00034b 2d5e                      	MOV count_unidades,uni_conf
-00034c 2d6f                      	MOV count_decenas,dec_conf
-00034d 2744                      	CLR segundos
-00034e 940c 03b7                 	JMP ISR_POP
+00034d 94e2                      	SWAP uni_conf
+00034e 2d1e                      	MOV R17,uni_conf
+00034f 94e2                      	SWAP uni_conf
+000350 701f                      	ANDI R17,0b0000_1111
+000351 951a                      	DEC R17
+000352 3f1f                      	CPI R17,0xFF
+000353 f041                      	BREQ underflow_disp3
+000354 94e2                      	SWAP uni_conf
+000355 94ea                      	DEC uni_conf
+000356 94e2                      	SWAP uni_conf
+000357 2d5e                      	MOV count_unidades,uni_conf
+000358 2d6f                      	MOV count_decenas,dec_conf
+000359 2744                      	CLR segundos
+00035a 940c 03c3                 	JMP ISR_POP
                                  
                                  underflow_disp3:
-000350 2d1f                      	MOV R17,dec_conf
-000351 7f10                      	ANDI R17,0b1111_0000
-000352 9512                      	SWAP R17
-000353 3012                      	CPI R17,0b0000_0010
-000354 f031                      	BREQ hora20
+00035c 2d1f                      	MOV R17,dec_conf
+00035d 7f10                      	ANDI R17,0b1111_0000
+00035e 9512                      	SWAP R17
+00035f 3012                      	CPI R17,0b0000_0010
+000360 f031                      	BREQ hora20
                                  
-000355 e00f                      	LDI R16,0b0000_1111
-000356 210e                      	AND R16,uni_conf
-000357 6900                      	ORI R16,0b1001_0000
-000358 2ee0                      	MOV uni_conf,R16
-000359 940c 03b7                 	JMP ISR_POP
+000361 e00f                      	LDI R16,0b0000_1111
+000362 210e                      	AND R16,uni_conf
+000363 6900                      	ORI R16,0b1001_0000
+000364 2ee0                      	MOV uni_conf,R16
+000365 940c 03c3                 	JMP ISR_POP
                                  
                                  hora20:
-00035b e00f                      	LDI R16,0b0000_1111
-00035c 210e                      	AND R16,uni_conf
-00035d 6300                      	ORI R16,0b0011_0000
-00035e 2ee0                      	MOV uni_conf,R16
-00035f 940c 03b7                 	JMP ISR_POP
+000367 e00f                      	LDI R16,0b0000_1111
+000368 210e                      	AND R16,uni_conf
+000369 6300                      	ORI R16,0b0011_0000
+00036a 2ee0                      	MOV uni_conf,R16
+00036b 940c 03c3                 	JMP ISR_POP
                                  
                                  restar_disp4:
-000361 94f2                      	SWAP dec_conf
-000362 2d1f                      	MOV R17,dec_conf
-000363 94f2                      	SWAP dec_conf
-000364 701f                      	ANDI R17,0b0000_1111
-000365 951a                      	DEC R17
-000366 3f1f                      	CPI R17,0xFF
-000367 f041                      	BREQ underflow_disp4
-000368 94f2                      	swap dec_conf
-000369 94fa                      	dec dec_conf
-00036a 94f2                      	swap dec_conf
-00036b 2d5e                      	MOV count_unidades,uni_conf
-00036c 2d6f                      	MOV count_decenas,dec_conf
-00036d 2744                      	CLR segundos
-00036e 940c 03b7                 	JMP ISR_POP
+00036d 94f2                      	SWAP dec_conf
+00036e 2d1f                      	MOV R17,dec_conf
+00036f 94f2                      	SWAP dec_conf
+000370 701f                      	ANDI R17,0b0000_1111
+000371 951a                      	DEC R17
+000372 3f1f                      	CPI R17,0xFF
+000373 f041                      	BREQ underflow_disp4
+000374 94f2                      	swap dec_conf
+000375 94fa                      	dec dec_conf
+000376 94f2                      	swap dec_conf
+000377 2d5e                      	MOV count_unidades,uni_conf
+000378 2d6f                      	MOV count_decenas,dec_conf
+000379 2744                      	CLR segundos
+00037a 940c 03c3                 	JMP ISR_POP
                                  
                                  underflow_disp4:
-000370 2d0f                      	MOV R16, dec_conf
-000371 700f                      	ANDI R16,0b0000_1111
-000372 6200                      	ORI R16,0b0010_0000
-000373 2ef0                      	MOV dec_conf,r16
-000374 940c 03b7                 	JMP ISR_POP
+00037c 2d0f                      	MOV R16, dec_conf
+00037d 700f                      	ANDI R16,0b0000_1111
+00037e 6200                      	ORI R16,0b0010_0000
+00037f 2ef0                      	MOV dec_conf,r16
+000380 940c 03c3                 	JMP ISR_POP
                                  
                                  
                                  //ALARMA
                                  cambiar_disp1_a:
-000376 94c3                      	INC alarma_uni
-000377 2d1c                      	MOV R17,alarma_uni
-000378 701f                      	ANDI R17,0b0000_1111
-000379 301a                      	CPI R17,0b0000_1010
-00037a f011                      	BREQ overflow_disp1_a
-00037b 940c 03b7                 	JMP ISR_POP
+000382 94c3                      	INC alarma_uni
+000383 2d1c                      	MOV R17,alarma_uni
+000384 701f                      	ANDI R17,0b0000_1111
+000385 301a                      	CPI R17,0b0000_1010
+000386 f011                      	BREQ overflow_disp1_a
+000387 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp1_a:
-00037d ef00                      	LDI R16,0b1111_0000
-00037e 210c                      	AND R16,alarma_uni
-00037f 2ec0                      	MOV alarma_uni, R16
-000380 940c 03b7                 	JMP ISR_POP
+000389 ef00                      	LDI R16,0b1111_0000
+00038a 210c                      	AND R16,alarma_uni
+00038b 2ec0                      	MOV alarma_uni, R16
+00038c 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp2_a:
-000382 94d3                      	INC alarma_dec
-000383 2d1d                      	MOV R17,alarma_dec
-000384 701f                      	ANDI R17,0b0000_1111
-000385 3016                      	CPI R17,0b0000_0110
-000386 f011                      	BREQ overflow_disp2_a
-000387 940c 03b7                 	JMP ISR_POP
+00038e 94d3                      	INC alarma_dec
+00038f 2d1d                      	MOV R17,alarma_dec
+000390 701f                      	ANDI R17,0b0000_1111
+000391 3016                      	CPI R17,0b0000_0110
+000392 f011                      	BREQ overflow_disp2_a
+000393 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp2_a:
-000389 ef00                      	LDI R16,0b1111_0000
-00038a 210d                      	AND R16,alarma_dec
-00038b 2ef0                      	MOV dec_conf,R16
-00038c 940c 03b7                 	JMP ISR_POP
+000395 ef00                      	LDI R16,0b1111_0000
+000396 210d                      	AND R16,alarma_dec
+000397 2ef0                      	MOV dec_conf,R16
+000398 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp3_a:
-00038e 94c2                      	SWAP alarma_uni
-00038f 94c3                      	INC alarma_uni
-000390 2d1c                      	MOV R17,alarma_uni
-000391 94c2                      	SWAP alarma_uni
-000392 701f                      	ANDI R17,0b0000_1111
-000393 3014                      	CPI R17,0b0000_0100
-000394 f031                      	BREQ ver_horaconf_a
-000395 301a                      	CPI R17,0b0000_1010
-000396 f059                      	BREQ overflow_disp3_a
-000397 2d5c                      	MOV count_unidades,alarma_uni
-000398 2d6f                      	MOV count_decenas,dec_conf
-000399 940c 03b7                 	JMP ISR_POP
+00039a 94c2                      	SWAP alarma_uni
+00039b 94c3                      	INC alarma_uni
+00039c 2d1c                      	MOV R17,alarma_uni
+00039d 94c2                      	SWAP alarma_uni
+00039e 701f                      	ANDI R17,0b0000_1111
+00039f 3014                      	CPI R17,0b0000_0100
+0003a0 f031                      	BREQ ver_horaconf_a
+0003a1 301a                      	CPI R17,0b0000_1010
+0003a2 f059                      	BREQ overflow_disp3_a
+0003a3 2d5c                      	MOV count_unidades,alarma_uni
+0003a4 2d6f                      	MOV count_decenas,dec_conf
+0003a5 940c 03c3                 	JMP ISR_POP
                                  
                                  ver_horaconf_a:
-00039b ef10                      	LDI R17,0b1111_0000
-00039c 211d                      	AND R17,alarma_dec
-00039d 9512                      	SWAP R17
-00039e 3012                      	CPI R17,0b0000_0010
-00039f f081                      	BREQ overflow_disp4
-0003a0 940c 03b7                 	JMP ISR_POP
+0003a7 ef10                      	LDI R17,0b1111_0000
+0003a8 211d                      	AND R17,alarma_dec
+0003a9 9512                      	SWAP R17
+0003aa 3012                      	CPI R17,0b0000_0010
+0003ab f081                      	BREQ overflow_disp4
+0003ac 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp3_a:
-0003a2 e00f                      	LDI R16,0b0000_1111
-0003a3 210c                      	AND R16,alarma_uni
-0003a4 2ec0                      	MOV alarma_uni,R16
-0003a5 940c 03b7                 	JMP ISR_POP
+0003ae e00f                      	LDI R16,0b0000_1111
+0003af 210c                      	AND R16,alarma_uni
+0003b0 2ec0                      	MOV alarma_uni,R16
+0003b1 940c 03c3                 	JMP ISR_POP
                                  
                                  cambiar_disp4_a:
-0003a7 94d2                      	SWAP alarma_dec
-0003a8 94d3                      	INC alarma_dec
-0003a9 2d1d                      	MOV R17,alarma_dec
-0003aa 94d2                      	SWAP alarma_dec
-0003ab 701f                      	ANDI R17,0b0000_1111
-0003ac 3013                      	CPI R17,0b0000_0011
-0003ad f011                      	BREQ overflow_disp4
-0003ae 940c 03b7                 	JMP ISR_POP
+0003b3 94d2                      	SWAP alarma_dec
+0003b4 94d3                      	INC alarma_dec
+0003b5 2d1d                      	MOV R17,alarma_dec
+0003b6 94d2                      	SWAP alarma_dec
+0003b7 701f                      	ANDI R17,0b0000_1111
+0003b8 3013                      	CPI R17,0b0000_0011
+0003b9 f011                      	BREQ overflow_disp4
+0003ba 940c 03c3                 	JMP ISR_POP
                                  
                                  overflow_disp4:
-0003b0 24cc                      	CLR alarma_uni
-0003b1 24dd                      	CLR alarma_dec
-0003b2 940c 03b7                 	JMP ISR_POP
+0003bc 24cc                      	CLR alarma_uni
+0003bd 24dd                      	CLR alarma_dec
+0003be 940c 03c3                 	JMP ISR_POP
                                  
                                  btn5:
-0003b4 982c                      	CBI PORTB,PB4
-0003b5 940c 03b7                 	JMP ISR_POP
+0003c0 982c                      	CBI PORTB,PB4
+0003c1 940c 03c3                 	JMP ISR_POP
                                  
                                  ISR_POP:
-0003b7 910f                      	POP R16
-0003b8 bf0f                      	OUT SREG,R16
-0003b9 910f                      	POP R16
-0003ba 9518                      	RETI
+0003c3 910f                      	POP R16
+0003c4 bf0f                      	OUT SREG,R16
+0003c5 910f                      	POP R16
+0003c6 9518                      	RETI
                                  
                                  //*******************************************************************
                                  //TABLA DE VALORES
                                  //*******************************************************************
-0003bb 063f
-0003bc 4f5b
-0003bd 6d66
-0003be 077d
-0003bf 6f7f
-0003c0 7c77
-0003c1 5e39
-0003c2 7179                      TABLA7SEG: .DB 0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71;
+0003c7 063f
+0003c8 4f5b
+0003c9 6d66
+0003ca 077d
+0003cb 6f7f
+0003cc 7c77
+0003cd 5e39
+0003ce 7179                      TABLA7SEG: .DB 0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71;
                                  
                                  
 
@@ -2242,38 +2255,38 @@ counted separately from r26..r31 here.
 
 "ATmega328P" register use summary:
 x  :   0 y  :   0 z  :   5 r0 :   6 r1 :   6 r2 :   6 r3 :   6 r4 :   0 
-r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:  18 r11:  26 r12:  16 
-r13:  15 r14:  40 r15:  37 r16: 288 r17: 112 r18:  23 r19:   4 r20:  12 
+r5 :   4 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:  18 r11:  26 r12:  16 
+r13:  15 r14:  40 r15:  37 r16: 290 r17: 112 r18:  23 r19:   4 r20:  12 
 r21:  22 r22:  23 r23:  17 r24:  12 r25:  16 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   9 r31:   5 
-Registers used: 23 out of 35 (65.7%)
+Registers used: 24 out of 35 (68.6%)
 
 "ATmega328P" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   4 adiw  :   0 and   :  49 
 andi  :  33 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :  86 brge  :   4 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :  87 brge  :   4 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   2 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :  18 cbi   :   7 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  33 cls   :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :  18 cbi   :   8 cbr   :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :  35 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :  91 cpse  :   0 dec   :   9 eor   :   0 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   4 inc   :  26 jmp   : 107 
+cpi   :  92 cpse  :   0 dec   :   9 eor   :   0 fmul  :   0 fmuls :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   4 inc   :  27 jmp   : 108 
 ld    :   0 ldd   :   0 ldi   :  86 lds   :   0 lpm   :  10 lsl   :   0 
-lsr   :   0 mov   : 111 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
+lsr   :   0 mov   : 112 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
 neg   :   0 nop   :   0 or    :   1 ori   :   7 out   :  19 pop   :   4 
 push  :   4 rcall :   0 ret   :   3 reti  :   2 rjmp  :   9 rol   :   0 
-ror   :   0 sbc   :   0 sbci  :   0 sbi   :   8 sbic  :   0 sbis  :   0 
+ror   :   0 sbc   :   0 sbci  :   0 sbi   :   9 sbic  :   1 sbis  :   1 
 sbiw  :   0 sbr   :   0 sbrc  :   5 sbrs  :   3 sec   :   0 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   4 
 sub   :   3 subi  :   0 swap  :  50 tst   :   0 wdr   :   0 
-Instructions used: 32 out of 113 (28.3%)
+Instructions used: 34 out of 113 (30.1%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000786   1854     16   1870   32768   5.7%
+[.cseg] 0x000000 0x00079e   1878     16   1894   32768   5.8%
 [.dseg] 0x000100 0x000100      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
